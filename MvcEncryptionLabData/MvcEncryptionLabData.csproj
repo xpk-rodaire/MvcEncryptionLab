@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="Random.cs" />
     <Compile Include="DAL.cs" />
     <Compile Include="DbEntities.cs" />
     <Compile Include="Utils.cs" />
@@ -62,7 +63,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Documentation\CA Zip Codes.xlsx" />
+    <None Include="Documentation\Names.xlsx" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Documentation\CaZipCode.sql" />
+    <Content Include="Documentation\dist.all.last.txt" />
+    <Content Include="Documentation\dist.female.first.txt" />
+    <Content Include="Documentation\dist.male.first.txt" />
+    <Content Include="Documentation\FemaleFirstName.sql" />
+    <Content Include="Documentation\LastName.sql" />
+    <Content Include="Documentation\MaleFirstName.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
