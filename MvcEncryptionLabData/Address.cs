@@ -10,6 +10,9 @@ namespace MvcEncryptionLabData
         [NotMapped]
         public string AddressLine1 { get; set; }
 
+        [StringLength(64)]
+        public string AddressLine1IV { get; set; }
+
         [StringLength(255)]
         public string AddressLine1Encrypted { get; set; }
 

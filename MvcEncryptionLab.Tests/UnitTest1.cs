@@ -10,25 +10,46 @@ namespace MvcEncryptionLab.Tests
     [TestClass]
     public class UnitTest1
     {
+
+        private const string privateKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+
         [TestMethod]
-        public void TestEncryptionSize()
+        public void TestEncryption()
         {
-            string str;
-            string eStr;
-            string dStr;
+            string plainText = "Steve was here but now he is gone";
+            string iv = "";
+            string cipherText = Utils.Encrypt(privateKey, plainText, ref iv);
+            string decryptedText = Utils.Decrypt(privateKey, cipherText, iv);
 
-            for( int index = 0; index < 1000; index++ )
-            {
-                str = Utils.RandomString(100);
-                eStr = Utils.Encrypt(str);
-                dStr = Utils.Decrypt(eStr);
-
-                Assert.AreEqual(str, dStr);
-
-                Debug.WriteLine(str);
-                Debug.WriteLine(eStr.Length);
-            }
+            Assert.AreEqual(plainText, decryptedText);
         }
+
+
+        //[TestMethod]
+        //public void TestEncryptionSize()
+        //{
+        //    string str;
+        //    string eStr;
+        //    string dStr;
+
+        //    for( int index = 0; index < 1000; index++ )
+        //    {
+        //        str = Utils.RandomString(100);
+        //        eStr = Utils.Encrypt(str);
+        //        dStr = Utils.Decrypt(eStr);
+
+        //        Assert.AreEqual(str, dStr);
+
+
+
+
+
+
+
+        //        Debug.WriteLine(str);
+        //        Debug.WriteLine(eStr.Length);
+        //    }
+        //}
 
         [TestMethod]
         public void AddPersons()
@@ -96,16 +117,12 @@ namespace MvcEncryptionLab.Tests
             }
         }
 
-
         [TestMethod]
         public void TestGetPerson()
         {
             DAL dal = new DAL();
-            Person person = dal.GetPersonBySSN("532707152", "94018", "DERICK");
-            Assert.AreEqual(person.LastName, "HEMLER");
-
-            // 0 - SSN = 532707152; LN = HEMLER; FN = DERICK; Zip = 94018
-
+            Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria");
+            Assert.AreEqual(person.LastName, "Hematoma");
         }
 
         [TestMethod]

@@ -17,12 +17,15 @@ namespace MvcEncryptionLabData
             {
                 string iv = "";
 
-                person.LastNameEncrypted = Utils.Encrypt2(privateKey, person.LastName, ref iv);
-                person.Address.AddressLine1Encrypted = Utils.Encrypt2(privateKey, person.Address.AddressLine1, ref iv);
+                person.LastNameEncrypted = Utils.Encrypt(privateKey, person.LastName, ref iv);
+                person.LastNameIV = iv;
+
+                person.Address.AddressLine1Encrypted = Utils.Encrypt(privateKey, person.Address.AddressLine1, ref iv);
+                person.Address.AddressLine1IV = iv;
 
                 person.SSNSalt = Utils.GetSalt();
                 person.SSNHash = Utils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = Utils.Encrypt2(privateKey, person.SSN, ref iv);
+                person.SSNEncrypted = Utils.Encrypt(privateKey, person.SSN, ref iv);
                 person.SSNIV = iv;
                 db.Person.Add(person);
 
@@ -47,8 +50,8 @@ namespace MvcEncryptionLabData
                     select p
                 ).FirstOrDefault();
 
-                person.LastName = Utils.Decrypt2(privateKey, person.LastNameEncrypted);
-                person.SSN = Utils.Decrypt2(privateKey, person.SSNEncrypted);
+                person.LastName = Utils.Decrypt(privateKey, person.LastNameEncrypted, person.LastNameIV);
+                person.SSN = Utils.Decrypt(privateKey, person.SSNEncrypted, person.SSNIV);
 
                 return person;
             }
@@ -80,8 +83,8 @@ namespace MvcEncryptionLabData
 
                         if (person.SSNHash.Equals(ssnToMatchHash))
                         {
-                            person.LastName = Utils.Decrypt2(privateKey, person.LastNameEncrypted);
-                            person.SSN = Utils.Decrypt2(privateKey, person.SSNEncrypted);
+                            person.LastName = Utils.Decrypt(privateKey, person.LastNameEncrypted, person.LastNameIV);
+                            person.SSN = Utils.Decrypt(privateKey, person.SSNEncrypted, person.SSNIV);
                             return person;
                         }
                     }

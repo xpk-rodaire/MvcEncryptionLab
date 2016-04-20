@@ -14,22 +14,31 @@ namespace MvcEncryptionLabData
         [NotMapped]
         public string LastName { get; set; }
 
+        [StringLength(64)]
+        [Required]
+        public string LastNameIV { get; set; }
+
         [StringLength(255)]
+        [Required]
         public string LastNameEncrypted { get; set; }
 
         [NotMapped]
         public string SSN { get; set; }
 
         [StringLength(64)]
+        [Required]
         public string SSNIV { get; set; }
 
         [StringLength(255)]
+        [Required]
         public string SSNEncrypted { get; set; }
 
         [StringLength(64)]
+        [Required]
         public string SSNSalt { get; set; }
 
         [StringLength(64)]
+        [Required]
         public string SSNHash { get; set; }
 
         public Address Address { get; set; }

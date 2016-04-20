@@ -26,20 +26,20 @@ namespace MvcEncryptionLabData
         /// </summary>
         /// <param name="plainText"></param>
         /// <returns></returns>
-        public static string Encrypt(string plainText)
-        {
-            string EncrptKey = "2013;[pnuLIT)WebCodeExpert";
-            byte[] byKey = { };
-            byte[] IV = { 18, 52, 86, 120, 144, 171, 205, 239 };
-            byKey = System.Text.Encoding.UTF8.GetBytes(EncrptKey.Substring(0, 8));
-            DESCryptoServiceProvider des = new DESCryptoServiceProvider();
-            byte[] inputByteArray = Encoding.UTF8.GetBytes(plainText);
-            MemoryStream ms = new MemoryStream();
-            CryptoStream cs = new CryptoStream(ms, des.CreateEncryptor(byKey, IV), CryptoStreamMode.Write);
-            cs.Write(inputByteArray, 0, inputByteArray.Length);
-            cs.FlushFinalBlock(); 
-            return Convert.ToBase64String(ms.ToArray());
-        }
+        //public static string Encrypt(string plainText)
+        //{
+        //    string EncrptKey = "2013;[pnuLIT)WebCodeExpert";
+        //    byte[] byKey = { };
+        //    byte[] IV = { 18, 52, 86, 120, 144, 171, 205, 239 };
+        //    byKey = System.Text.Encoding.UTF8.GetBytes(EncrptKey.Substring(0, 8));
+        //    DESCryptoServiceProvider des = new DESCryptoServiceProvider();
+        //    byte[] inputByteArray = Encoding.UTF8.GetBytes(plainText);
+        //    MemoryStream ms = new MemoryStream();
+        //    CryptoStream cs = new CryptoStream(ms, des.CreateEncryptor(byKey, IV), CryptoStreamMode.Write);
+        //    cs.Write(inputByteArray, 0, inputByteArray.Length);
+        //    cs.FlushFinalBlock(); 
+        //    return Convert.ToBase64String(ms.ToArray());
+        //}
 
         /// <summary>
         /// http://stackoverflow.com/questions/8041451/good-aes-initialization-vector-practice
@@ -48,39 +48,63 @@ namespace MvcEncryptionLabData
         /// <param name="plainText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        public static string Encrypt2(string privateKey, string plainText, ref string iv)
+        //public static string Encrypt2(string privateKey, string plainText, ref string iv)
+        //{
+        //    using (var aes = new AesCryptoServiceProvider()
+        //    {
+        //        Key = Convert.FromBase64String(privateKey),
+        //        Mode = CipherMode.CBC,
+        //        Padding = PaddingMode.PKCS7
+        //    })
+        //    {
+        //        var input = Encoding.UTF8.GetBytes(plainText);
+        //        aes.GenerateIV();
+        //        var ivAsBytes = aes.IV;
+
+        //        using (var encrypter = aes.CreateEncryptor(aes.Key, ivAsBytes))
+        //        {
+        //            using (var cipherStream = new MemoryStream())
+        //            {
+        //                using (var tCryptoStream = new CryptoStream(cipherStream, encrypter, CryptoStreamMode.Write))
+        //                {
+        //                    using (var tBinaryWriter = new BinaryWriter(tCryptoStream))
+        //                    {
+        //                        // Prepend IV to data
+        //                        cipherStream.Write(ivAsBytes, 0, ivAsBytes.Length);  // Write iv to the plain stream (not tested though)
+        //                        tBinaryWriter.Write(input);
+        //                        tCryptoStream.FlushFinalBlock();
+        //                    }
+
+        //                    iv = Convert.ToBase64String(ivAsBytes);
+        //                    return Convert.ToBase64String(cipherStream.ToArray());
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        public static string Encrypt(string privateKey, string plainText, ref string iv)
         {
-            using (var aes = new AesCryptoServiceProvider()
-            {
-                Key = Convert.FromBase64String(privateKey),
-                Mode = CipherMode.CBC,
-                Padding = PaddingMode.PKCS7
-            })
-            {
-                var input = Encoding.UTF8.GetBytes(plainText);
-                aes.GenerateIV();
-                var ivAsBytes = aes.IV;
+            AesManaged aes = new AesManaged();
+            aes.GenerateIV();
+            var ivAsBytes = aes.IV;
 
-                using (var encrypter = aes.CreateEncryptor(aes.Key, ivAsBytes))
-                {
-                    using (var cipherStream = new MemoryStream())
-                    {
-                        using (var tCryptoStream = new CryptoStream(cipherStream, encrypter, CryptoStreamMode.Write))
-                        {
-                            using (var tBinaryWriter = new BinaryWriter(tCryptoStream))
-                            {
-                                // Prepend IV to data
-                                cipherStream.Write(ivAsBytes, 0, ivAsBytes.Length);  // Write iv to the plain stream (not tested though)
-                                tBinaryWriter.Write(input);
-                                tCryptoStream.FlushFinalBlock();
-                            }
+            ICryptoTransform encryptor = aes.CreateEncryptor(Convert.FromBase64String(privateKey), aes.IV);
 
-                            iv = Convert.ToBase64String(ivAsBytes);
-                            return Convert.ToBase64String(cipherStream.ToArray());
-                        }
-                    }
-                }
+            // Create the streams used for encryption.
+            MemoryStream memoryStream = new MemoryStream();
+            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+            {
+                byte[] plainTextAsBytes = new UTF8Encoding(false).GetBytes(plainText);
+                cryptoStream.Write(plainTextAsBytes, 0, plainTextAsBytes.Length);
             }
+
+            aes.Clear();
+
+            byte[] encryptedData = memoryStream.ToArray();
+
+            iv = Convert.ToBase64String(ivAsBytes);
+            return Convert.ToBase64String(encryptedData);
         }
 
         /// <summary>
@@ -129,39 +153,59 @@ namespace MvcEncryptionLabData
         //    }
         //}
 
-        public static string Decrypt2(string privateKey, string cipherText)
+        //public static string Decrypt2(string privateKey, string cipherText)
+        //{
+        //    using (var aes = new AesCryptoServiceProvider()
+        //    {
+        //        Key = Convert.FromBase64String(privateKey),
+        //        Mode = CipherMode.CBC,
+        //        Padding = PaddingMode.PKCS7
+        //    })
+        //    {
+        //        var input = Encoding.UTF8.GetBytes(cipherText);
+
+        //        // get first 16 bytes of IV and use it to decrypt
+        //        var iv = new byte[16];
+        //        Array.Copy(input, 0, iv, 0, iv.Length);
+
+        //        using (var ms = new MemoryStream())
+        //        {
+        //            using (var cs = new CryptoStream(ms, aes.CreateDecryptor(aes.Key, iv), CryptoStreamMode.Write))
+        //            {
+        //                using (var binaryWriter = new BinaryWriter(cs))
+        //                {
+        //                    // Decrypt Cipher Text from Message
+        //                    binaryWriter.Write(
+        //                        input,
+        //                        iv.Length,
+        //                        input.Length - iv.Length
+        //                    );
+        //                }
+        //            }
+
+        //            return Encoding.Default.GetString(ms.ToArray());
+        //        }
+        //    }
+        //}
+
+        public static string Decrypt(string privateKey, string cipherText, string iv)
         {
-            using (var aes = new AesCryptoServiceProvider()
+            AesManaged aes = new AesManaged();
+
+            ICryptoTransform decryptor = aes.CreateDecryptor(Convert.FromBase64String(privateKey), Convert.FromBase64String(iv));
+
+            // Create the streams used for encryption.
+            MemoryStream memoryStream = new MemoryStream();
+            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Write))
             {
-                Key = Convert.FromBase64String(privateKey),
-                Mode = CipherMode.CBC,
-                Padding = PaddingMode.PKCS7
-            })
-            {
-                var input = Encoding.UTF8.GetBytes(cipherText);
-
-                // get first 16 bytes of IV and use it to decrypt
-                var iv = new byte[16];
-                Array.Copy(input, 0, iv, 0, iv.Length);
-
-                using (var ms = new MemoryStream())
-                {
-                    using (var cs = new CryptoStream(ms, aes.CreateDecryptor(aes.Key, iv), CryptoStreamMode.Write))
-                    {
-                        using (var binaryWriter = new BinaryWriter(cs))
-                        {
-                            // Decrypt Cipher Text from Message
-                            binaryWriter.Write(
-                                input,
-                                iv.Length,
-                                input.Length - iv.Length
-                            );
-                        }
-                    }
-
-                    return Encoding.Default.GetString(ms.ToArray());
-                }
+                byte[] encryptedDataAsBytes = Convert.FromBase64String(cipherText);
+                cryptoStream.Write(encryptedDataAsBytes, 0, encryptedDataAsBytes.Length);
             }
+
+            aes.Clear();
+
+            byte[] decryptedData = memoryStream.ToArray();
+            return Encoding.UTF8.GetString(decryptedData);
         }
 
         /// <summary>
@@ -169,26 +213,26 @@ namespace MvcEncryptionLabData
         /// </summary>
         /// <param name="cipherText"></param>
         /// <returns></returns>
-        public static string Decrypt(string cipherText)
-        {
-            cipherText = cipherText.Replace(" ", "+");
-            string DecryptKey = "2013;[pnuLIT)WebCodeExpert";
-            byte[] byKey = { };
-            byte[] IV = { 18, 52, 86, 120, 144, 171, 205, 239 };
-            byte[] inputByteArray = new byte[cipherText.Length];
+        //public static string Decrypt(string cipherText)
+        //{
+        //    cipherText = cipherText.Replace(" ", "+");
+        //    string DecryptKey = "2013;[pnuLIT)WebCodeExpert";
+        //    byte[] byKey = { };
+        //    byte[] IV = { 18, 52, 86, 120, 144, 171, 205, 239 };
+        //    byte[] inputByteArray = new byte[cipherText.Length];
 
-            byKey = System.Text.Encoding.UTF8.GetBytes(DecryptKey.Substring(0, 8));
-            DESCryptoServiceProvider des = new DESCryptoServiceProvider();
+        //    byKey = System.Text.Encoding.UTF8.GetBytes(DecryptKey.Substring(0, 8));
+        //    DESCryptoServiceProvider des = new DESCryptoServiceProvider();
 
 
-            inputByteArray = Convert.FromBase64String(cipherText.Replace(" ", "+"));
-            MemoryStream ms = new MemoryStream();
-            CryptoStream cs = new CryptoStream(ms, des.CreateDecryptor(byKey, IV), CryptoStreamMode.Write);
-            cs.Write(inputByteArray, 0, inputByteArray.Length);
-            cs.FlushFinalBlock();
-            System.Text.Encoding encoding = System.Text.Encoding.UTF8;
-            return encoding.GetString(ms.ToArray());
-        }
+        //    inputByteArray = Convert.FromBase64String(cipherText.Replace(" ", "+"));
+        //    MemoryStream ms = new MemoryStream();
+        //    CryptoStream cs = new CryptoStream(ms, des.CreateDecryptor(byKey, IV), CryptoStreamMode.Write);
+        //    cs.Write(inputByteArray, 0, inputByteArray.Length);
+        //    cs.FlushFinalBlock();
+        //    System.Text.Encoding encoding = System.Text.Encoding.UTF8;
+        //    return encoding.GetString(ms.ToArray());
+        //}
 
         public static string GetSalt()
         {
