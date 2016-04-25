@@ -14,11 +14,11 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestEncryption()
         {
-            string securityKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+            string encryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
             string plainText = "Steve was here but now he is gone";
             string iv = "";
-            string cipherText = SecurityUtils.Encrypt(securityKey, plainText, ref iv);
-            string decryptedText = SecurityUtils.Decrypt(securityKey, cipherText, iv);
+            string cipherText = SecurityUtils.Encrypt(encryptionKey, plainText, ref iv);
+            string decryptedText = SecurityUtils.Decrypt(encryptionKey, cipherText, iv);
 
             Assert.AreEqual(plainText, decryptedText);
         }
@@ -100,13 +100,12 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestGetPersonSetSecurityKey()
         {
-            DAL.SecurityKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+            DAL.EncryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
 
             DAL dal = new DAL();
             Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria");
             Assert.AreEqual(person.LastName, "Hematoma");
         }
-
 
         [TestMethod]
         public void GenerateAesKey()
@@ -118,21 +117,20 @@ namespace MvcEncryptionLab.Tests
             Debug.WriteLine(keyAsString);
         }
 
-
         [TestMethod]
         public void TestAesProvider()
         {
             try
             {
-                string securityKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+                string encryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
                 string original = "Here is some data to encrypt!";
 
                 string iv = "";
                 // Encrypt the string to an array of bytes.
-                string encrypted = SecurityUtils.Encrypt(securityKey, original, ref iv);
+                string encrypted = SecurityUtils.Encrypt(encryptionKey, original, ref iv);
 
                 // Decrypt the bytes to a string.
-                string roundtrip = SecurityUtils.Decrypt(securityKey, encrypted, iv);
+                string roundtrip = SecurityUtils.Decrypt(encryptionKey, encrypted, iv);
 
                 Assert.AreEqual(original, roundtrip);
             }

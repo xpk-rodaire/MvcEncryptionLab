@@ -9,22 +9,22 @@ namespace MvcEncryptionLabData
 {
     public class DAL
     {
-        private static ExpirableSecureValue _securityKey = new ExpirableSecureValue(300);
+        private static ExpirableSecureValue _encryptionKey = new ExpirableSecureValue(300);
 
-        public static string SecurityKey
+        public static string EncryptionKey
         {
             set
             {
-                _securityKey.Value = value;
+                _encryptionKey.Value = value;
             }
 
             private get
             {
-                if (!_securityKey.HasValue)
+                if (!_encryptionKey.HasValue)
                 {
-                    throw new ApplicationException("Private key not available.");
+                    throw new ApplicationException("Security key not available.");
                 }
-                return _securityKey.Value;
+                return _encryptionKey.Value;
             }
         }
 
@@ -36,15 +36,15 @@ namespace MvcEncryptionLabData
             {
                 string iv = "";
 
-                person.LastNameEncrypted = SecurityUtils.Encrypt(SecurityKey, person.LastName, ref iv);
+                person.LastNameEncrypted = SecurityUtils.Encrypt(EncryptionKey, person.LastName, ref iv);
                 person.LastNameIV = iv;
 
-                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(SecurityKey, person.Address.AddressLine1, ref iv);
+                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(EncryptionKey, person.Address.AddressLine1, ref iv);
                 person.Address.AddressLine1IV = iv;
 
                 person.SSNSalt = SecurityUtils.GetSalt();
                 person.SSNHash = SecurityUtils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = SecurityUtils.Encrypt(SecurityKey, person.SSN, ref iv);
+                person.SSNEncrypted = SecurityUtils.Encrypt(EncryptionKey, person.SSN, ref iv);
                 person.SSNIV = iv;
                 db.Person.Add(person);
 
@@ -69,8 +69,8 @@ namespace MvcEncryptionLabData
                     select p
                 ).FirstOrDefault();
 
-                person.LastName = SecurityUtils.Decrypt(SecurityKey, person.LastNameEncrypted, person.LastNameIV);
-                person.SSN = SecurityUtils.Decrypt(SecurityKey, person.SSNEncrypted, person.SSNIV);
+                person.LastName = SecurityUtils.Decrypt(EncryptionKey, person.LastNameEncrypted, person.LastNameIV);
+                person.SSN = SecurityUtils.Decrypt(EncryptionKey, person.SSNEncrypted, person.SSNIV);
 
                 return person;
             }
@@ -102,8 +102,8 @@ namespace MvcEncryptionLabData
 
                         if (person.SSNHash.Equals(ssnToMatchHash))
                         {
-                            person.LastName = SecurityUtils.Decrypt(SecurityKey, person.LastNameEncrypted, person.LastNameIV);
-                            person.SSN = SecurityUtils.Decrypt(SecurityKey, person.SSNEncrypted, person.SSNIV);
+                            person.LastName = SecurityUtils.Decrypt(EncryptionKey, person.LastNameEncrypted, person.LastNameIV);
+                            person.SSN = SecurityUtils.Decrypt(EncryptionKey, person.SSNEncrypted, person.SSNIV);
                             return person;
                         }
                     }
