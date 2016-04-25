@@ -4,52 +4,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MvcEncryptionLabData;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security;
 
 namespace MvcEncryptionLab.Tests
 {
     [TestClass]
     public class UnitTest1
     {
-
-        private const string privateKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
-
         [TestMethod]
         public void TestEncryption()
         {
+            string securityKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
             string plainText = "Steve was here but now he is gone";
             string iv = "";
-            string cipherText = Utils.Encrypt(privateKey, plainText, ref iv);
-            string decryptedText = Utils.Decrypt(privateKey, cipherText, iv);
+            string cipherText = SecurityUtils.Encrypt(securityKey, plainText, ref iv);
+            string decryptedText = SecurityUtils.Decrypt(securityKey, cipherText, iv);
 
             Assert.AreEqual(plainText, decryptedText);
         }
-
-
-        //[TestMethod]
-        //public void TestEncryptionSize()
-        //{
-        //    string str;
-        //    string eStr;
-        //    string dStr;
-
-        //    for( int index = 0; index < 1000; index++ )
-        //    {
-        //        str = Utils.RandomString(100);
-        //        eStr = Utils.Encrypt(str);
-        //        dStr = Utils.Decrypt(eStr);
-
-        //        Assert.AreEqual(str, dStr);
-
-
-
-
-
-
-
-        //        Debug.WriteLine(str);
-        //        Debug.WriteLine(eStr.Length);
-        //    }
-        //}
 
         [TestMethod]
         public void AddPersons()
@@ -126,6 +98,17 @@ namespace MvcEncryptionLab.Tests
         }
 
         [TestMethod]
+        public void TestGetPersonSetSecurityKey()
+        {
+            DAL.SecurityKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+
+            DAL dal = new DAL();
+            Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria");
+            Assert.AreEqual(person.LastName, "Hematoma");
+        }
+
+
+        [TestMethod]
         public void GenerateAesKey()
         {
             AesManaged aes = new AesManaged();
@@ -133,6 +116,75 @@ namespace MvcEncryptionLab.Tests
             byte[] keyAsBytes = aes.Key;
             string keyAsString = Convert.ToBase64String(keyAsBytes);
             Debug.WriteLine(keyAsString);
+        }
+
+
+        [TestMethod]
+        public void TestAesProvider()
+        {
+            try
+            {
+                string securityKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+                string original = "Here is some data to encrypt!";
+
+                string iv = "";
+                // Encrypt the string to an array of bytes.
+                string encrypted = SecurityUtils.Encrypt(securityKey, original, ref iv);
+
+                // Decrypt the bytes to a string.
+                string roundtrip = SecurityUtils.Decrypt(securityKey, encrypted, iv);
+
+                Assert.AreEqual(original, roundtrip);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [TestMethod]
+        public void TestSecureString()
+        {
+            try
+            {
+                string original = "Here is some data to encrypt!";
+
+                SecureString originalSS = original.ConvertToSecureString();
+
+                string originalSSConvert = originalSS.ConvertToUnsecureString();
+
+                Assert.AreEqual(original, originalSSConvert);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [TestMethod]
+        public void TestExpirableSecureValue()
+        {
+            try
+            {
+                ExpirableSecureValue value = new ExpirableSecureValue(5);
+                value.Value = "Here is some data to encrypt!";
+
+                System.Threading.Thread.Sleep(4000);
+
+                Assert.IsTrue(value.HasValue);
+
+                System.Threading.Thread.Sleep(2000);
+
+                Assert.IsFalse(value.HasValue);
+
+                value.Value = "Here is some data to encrypt!";
+                System.Threading.Thread.Sleep(5001);
+                Assert.IsFalse(value.HasValue);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message);
+            }
         }
     }
 }

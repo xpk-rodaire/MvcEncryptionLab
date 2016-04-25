@@ -9,7 +9,26 @@ namespace MvcEncryptionLabData
 {
     public class DAL
     {
-        private const string privateKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+        private static ExpirableSecureValue _securityKey = new ExpirableSecureValue(300);
+
+        public static string SecurityKey
+        {
+            set
+            {
+                _securityKey.Value = value;
+            }
+
+            private get
+            {
+                if (!_securityKey.HasValue)
+                {
+                    throw new ApplicationException("Private key not available.");
+                }
+                return _securityKey.Value;
+            }
+        }
+
+        //private const string privateKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
 
         public void AddPerson(Person person)
         {
@@ -17,15 +36,15 @@ namespace MvcEncryptionLabData
             {
                 string iv = "";
 
-                person.LastNameEncrypted = Utils.Encrypt(privateKey, person.LastName, ref iv);
+                person.LastNameEncrypted = SecurityUtils.Encrypt(SecurityKey, person.LastName, ref iv);
                 person.LastNameIV = iv;
 
-                person.Address.AddressLine1Encrypted = Utils.Encrypt(privateKey, person.Address.AddressLine1, ref iv);
+                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(SecurityKey, person.Address.AddressLine1, ref iv);
                 person.Address.AddressLine1IV = iv;
 
-                person.SSNSalt = Utils.GetSalt();
-                person.SSNHash = Utils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = Utils.Encrypt(privateKey, person.SSN, ref iv);
+                person.SSNSalt = SecurityUtils.GetSalt();
+                person.SSNHash = SecurityUtils.Hash(person.SSN, person.SSNSalt);
+                person.SSNEncrypted = SecurityUtils.Encrypt(SecurityKey, person.SSN, ref iv);
                 person.SSNIV = iv;
                 db.Person.Add(person);
 
@@ -50,8 +69,8 @@ namespace MvcEncryptionLabData
                     select p
                 ).FirstOrDefault();
 
-                person.LastName = Utils.Decrypt(privateKey, person.LastNameEncrypted, person.LastNameIV);
-                person.SSN = Utils.Decrypt(privateKey, person.SSNEncrypted, person.SSNIV);
+                person.LastName = SecurityUtils.Decrypt(SecurityKey, person.LastNameEncrypted, person.LastNameIV);
+                person.SSN = SecurityUtils.Decrypt(SecurityKey, person.SSNEncrypted, person.SSNIV);
 
                 return person;
             }
@@ -79,12 +98,12 @@ namespace MvcEncryptionLabData
                 {
                     foreach (Person person in persons)
                     {
-                        string ssnToMatchHash = Utils.Hash(ssn, person.SSNSalt);
+                        string ssnToMatchHash = SecurityUtils.Hash(ssn, person.SSNSalt);
 
                         if (person.SSNHash.Equals(ssnToMatchHash))
                         {
-                            person.LastName = Utils.Decrypt(privateKey, person.LastNameEncrypted, person.LastNameIV);
-                            person.SSN = Utils.Decrypt(privateKey, person.SSNEncrypted, person.SSNIV);
+                            person.LastName = SecurityUtils.Decrypt(SecurityKey, person.LastNameEncrypted, person.LastNameIV);
+                            person.SSN = SecurityUtils.Decrypt(SecurityKey, person.SSNEncrypted, person.SSNIV);
                             return person;
                         }
                     }
@@ -126,12 +145,12 @@ namespace MvcEncryptionLabData
 
                 person.LastName = lastName.Value;
 
-                person.SSN = Utils.RandomSSN();
+                person.SSN = SecurityUtils.RandomSSN();
 
                 Address address = new Address();
                 person.Address = address;
 
-                address.AddressLine1 = Utils.RandomString(25);
+                address.AddressLine1 = SecurityUtils.RandomString(25);
 
                 int zipCodeId = random.Next(1, ZIP_CODE_COUNT);
 

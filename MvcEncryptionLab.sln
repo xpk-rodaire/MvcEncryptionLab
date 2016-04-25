@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcEncryptionLab.Tests", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcEncryptionLabData", "MvcEncryptionLabData\MvcEncryptionLabData.csproj", "{D216CF63-F2DE-46D7-9FA7-B290BF4FF95C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FipsCheckerUtility", "FipsCheckerUtility\FipsCheckerUtility.csproj", "{C7F1A9E5-BF74-499B-A7CC-A0D11D331117}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D216CF63-F2DE-46D7-9FA7-B290BF4FF95C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D216CF63-F2DE-46D7-9FA7-B290BF4FF95C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D216CF63-F2DE-46D7-9FA7-B290BF4FF95C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7F1A9E5-BF74-499B-A7CC-A0D11D331117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7F1A9E5-BF74-499B-A7CC-A0D11D331117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7F1A9E5-BF74-499B-A7CC-A0D11D331117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7F1A9E5-BF74-499B-A7CC-A0D11D331117}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
