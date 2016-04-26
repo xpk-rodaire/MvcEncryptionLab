@@ -7,7 +7,7 @@ namespace MvcEncryptionLabData
     {
         public int AddressId { get; set; }
 
-        [NotMapped]
+        [NotMapped()]
         public string AddressLine1 { get; set; }
 
         [StringLength(64)]
