@@ -36,6 +36,8 @@ namespace MvcEncryptionLabData
         public int LastNameId { get; set; }
         public string Value { get; set; }
         public float Frequency { get; set; }
+        public float CumulativeFrequency { get; set; }
+        public short Rank { get; set; }
     }
 
     public class FirstName
@@ -43,6 +45,8 @@ namespace MvcEncryptionLabData
         public int FirstNameId { get; set; }
         public string Value { get; set; }
         public float Frequency { get; set; }
+        public float CumulativeFrequency { get; set; }
+        public short Rank { get; set; }
         public bool IsMale { get; set; }
     }
 }
