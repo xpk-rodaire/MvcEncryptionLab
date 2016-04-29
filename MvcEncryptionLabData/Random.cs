@@ -12,6 +12,8 @@ namespace MvcEncryptionLabData
         public string ZipCode { get; set; }
         public string City { get; set; }
         public int Population { get; set; }
+        public int RangeLow { get; set; }
+        public int RangeHigh { get; set; }
     }
 
     /*
