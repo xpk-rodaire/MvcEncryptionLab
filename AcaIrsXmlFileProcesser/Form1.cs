@@ -97,7 +97,6 @@ namespace AcaIrsXmlFileProcesser
                 XPathNavigator navigator = document.CreateNavigator();
 
                 XmlNamespaceManager manager = new XmlNamespaceManager(navigator.NameTable);
-
                 manager.AddNamespace("uibizheader", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
                 manager.AddNamespace("bizheader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
                 manager.AddNamespace("air70", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
@@ -114,6 +113,9 @@ namespace AcaIrsXmlFileProcesser
                 uniqueTransIdNav.SetValue(uniqueTransId + "SLC");
 
                 document.Save(manifestFile);
+
+                this.btnProcess.Enabled = false;
+                this.txtFolderPath.Text = "";
             }
             catch (Exception ex)
             {
@@ -121,10 +123,9 @@ namespace AcaIrsXmlFileProcesser
                     String.Format("Error processing manifest file : '{0}'.", ex.Message),
                     "File Processing",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
+                    MessageBoxIcon.Error
                 );
                 this.btnProcess.Enabled = false;
-                return;
             }
         }
 

@@ -12,7 +12,50 @@ namespace MvcEncryptionLabData
 {
     public class SecurityUtils
     {
-        public static string EncryptionKey { get; set; }
+        private static Dictionary<string, ExpirableSecureValue> _encryptionKeys = new Dictionary<string, ExpirableSecureValue>();
+
+        public static string GetUserEncryptionKey(string user)
+        {
+            ExpirableSecureValue secureValue;
+            _encryptionKeys.TryGetValue(user, out secureValue);
+
+            if (secureValue == null || !secureValue.HasValue)
+            {
+                throw new ApplicationException("Security key not available.");
+            }
+            else
+            {
+                return secureValue.Value;
+            }
+        }
+
+        public static void SetUserEncryptionKey(string user, string value)
+        {
+            ExpirableSecureValue secureValue;
+            _encryptionKeys.TryGetValue(user, out secureValue);
+
+            if (secureValue != null)
+            {
+                _encryptionKeys.Remove(user);
+            }
+
+            ExpirableSecureValue newSecureValue = new ExpirableSecureValue(300);
+            newSecureValue.Value = value;
+            _encryptionKeys.Add(user, newSecureValue);
+        }
+
+        public static void LockUserEncryptionKey(string user, bool isLocked)
+        {
+            ExpirableSecureValue secureValue;
+            _encryptionKeys.TryGetValue(user, out secureValue);
+
+            if (secureValue != null)
+            {
+                secureValue.IsLocked = isLocked;
+            }
+        }
+
+        public static string EncryptionKeyTestingOnly { get; set; }
 
         private static RNGCryptoServiceProvider crypto;
 
@@ -51,9 +94,9 @@ namespace MvcEncryptionLabData
             return Convert.ToBase64String(hashedBytes);
         }
 
-        public static string Encrypt(string plainText, ref string iv)
+        public static string Encrypt(string plainText, ref string iv, string user)
         {
-            return Encrypt(EncryptionKey, plainText, ref iv);
+            return _Encrypt(EncryptionKeyTestingOnly, plainText, ref iv);
         }
 
         /// <summary>
@@ -63,7 +106,7 @@ namespace MvcEncryptionLabData
         /// <param name="plainText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        private static string Encrypt(string privateKey, string plainText, ref string iv)
+        private static string _Encrypt(string privateKey, string plainText, ref string iv)
         {
             // Check arguments.
             if (plainText == null || plainText.Length <= 0)
@@ -102,9 +145,9 @@ namespace MvcEncryptionLabData
             return Convert.ToBase64String(encrypted);
         }
 
-        public static string Decrypt(string cipherText, string iv)
+        public static string Decrypt(string cipherText, string iv, string user)
         {
-            return Decrypt(EncryptionKey, cipherText, iv);
+            return _Decrypt(EncryptionKeyTestingOnly, cipherText, iv);
         }
 
         /// <summary>
@@ -114,7 +157,7 @@ namespace MvcEncryptionLabData
         /// <param name="cipherText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        private static string Decrypt(string privateKey, string cipherText, string iv)
+        private static string _Decrypt(string privateKey, string cipherText, string iv)
         {
             byte[] cipherTextAsBytes = Convert.FromBase64String(cipherText);
 
@@ -194,16 +237,6 @@ namespace MvcEncryptionLabData
             securePassword.MakeReadOnly();
 
             return securePassword;
-
-            //unsafe
-            //{
-            //    fixed (char* passwordChars = password)
-            //    {
-            //        var securePassword = new SecureString(passwordChars, password.Length);
-            //        securePassword.MakeReadOnly();
-            //        return securePassword;
-            //    }
-            //}
         }
     }
 
@@ -212,6 +245,7 @@ namespace MvcEncryptionLabData
         private SecureString _value = null;
         private int _expireInSeconds = 0;
         private DateTime _expireTime;
+        private bool _isLocked = false;
 
         public ExpirableSecureValue(int expireInSeconds)
         {
@@ -221,6 +255,22 @@ namespace MvcEncryptionLabData
             }
 
             this._expireInSeconds = expireInSeconds;
+        }
+
+        public bool IsLocked
+        {
+            get
+            {
+                return this._isLocked;
+            }
+            
+            set
+            {
+                if (this._value != null)
+                {
+                    this._isLocked = value;
+                }
+            }
         }
 
         public string Value
@@ -235,7 +285,11 @@ namespace MvcEncryptionLabData
             {
                 if (this._value != null)
                 {
-                    if (DateTime.Compare(DateTime.Now, this._expireTime) < 0)
+                    if (IsLocked)
+                    {
+                        return this._value.ConvertToUnsecureString();
+                    }
+                    else if (DateTime.Compare(DateTime.Now, this._expireTime) < 0)
                     {
                         return this._value.ConvertToUnsecureString();
                     }
@@ -243,6 +297,7 @@ namespace MvcEncryptionLabData
                     {
                         this._value.Dispose();
                         this._value = null;
+                        this.IsLocked = false;
                         return null;
                     }
                 }

@@ -18,12 +18,12 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestEncryption()
         {
-            SecurityUtils.EncryptionKey = encryptionKey;
+            SecurityUtils.EncryptionKeyTestingOnly = encryptionKey;
 
             string plainText = "Steve was here but now he is gone";
             string iv = "";
-            string cipherText = SecurityUtils.Encrypt(plainText, ref iv);
-            string decryptedText = SecurityUtils.Decrypt(cipherText, iv);
+            string cipherText = SecurityUtils.Encrypt(plainText, ref iv, "");
+            string decryptedText = SecurityUtils.Decrypt(cipherText, iv, "");
 
             Assert.AreEqual(plainText, decryptedText);
         }
@@ -31,7 +31,7 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void AddPersons()
         {
-            SecurityUtils.EncryptionKey = encryptionKey;
+            SecurityUtils.EncryptionKeyTestingOnly = encryptionKey;
 
             DAL dal = new DAL();
 
@@ -107,7 +107,7 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestGetPersonSetSecurityKey()
         {
-            SecurityUtils.EncryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+            SecurityUtils.EncryptionKeyTestingOnly = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
 
             DAL dal = new DAL();
             Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria", "schampeau");
@@ -134,10 +134,10 @@ namespace MvcEncryptionLab.Tests
 
                 string iv = "";
                 // Encrypt the string to an array of bytes.
-                string encrypted = SecurityUtils.Encrypt(original, ref iv);
+                string encrypted = SecurityUtils.Encrypt(original, ref iv, "");
 
                 // Decrypt the bytes to a string.
-                string roundtrip = SecurityUtils.Decrypt(encrypted, iv);
+                string roundtrip = SecurityUtils.Decrypt(encrypted, iv, "");
 
                 Assert.AreEqual(original, roundtrip);
             }
