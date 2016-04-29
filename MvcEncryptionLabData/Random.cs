@@ -11,6 +11,7 @@ namespace MvcEncryptionLabData
         public int CaZipCodeId { get; set; }
         public string ZipCode { get; set; }
         public string City { get; set; }
+        public int Population { get; set; }
     }
 
     /*
@@ -24,7 +25,7 @@ namespace MvcEncryptionLabData
     
         In the file (dist.all.last) one entry appears as:
 
-            MOORE 0.312 5.312 9
+            MOORE 0.312 5.312 9 
 
         In our search area sample, MOORE ranks 9th in terms of frequency. 5.312 percent of the sample 
         population is covered by MOORE and the 8 names occurring more frequently than MOORE. The surname, 
