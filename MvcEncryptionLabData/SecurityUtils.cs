@@ -12,14 +12,12 @@ namespace MvcEncryptionLabData
 {
     public class SecurityUtils
     {
-        private static Random random;
+        public static string EncryptionKey { get; set; }
+
         private static RNGCryptoServiceProvider crypto;
-        private const string CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private const string NUMBERS = "0123456789";
 
         static SecurityUtils()
         {
-            random = new Random();
             crypto = new RNGCryptoServiceProvider();
         }
 
@@ -53,20 +51,9 @@ namespace MvcEncryptionLabData
             return Convert.ToBase64String(hashedBytes);
         }
 
-        private static string RandomString(int length, string chars)
+        public static string Encrypt(string plainText, ref string iv)
         {
-            return new string(Enumerable.Repeat(chars, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        public static string RandomString(int length)
-        {
-            return RandomString(length, CHARS);
-        }
-
-        public static string RandomSSN()
-        {
-            return RandomString(9, NUMBERS);
+            return Encrypt(EncryptionKey, plainText, ref iv);
         }
 
         /// <summary>
@@ -76,7 +63,7 @@ namespace MvcEncryptionLabData
         /// <param name="plainText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        public static string Encrypt(string privateKey, string plainText, ref string iv)
+        private static string Encrypt(string privateKey, string plainText, ref string iv)
         {
             // Check arguments.
             if (plainText == null || plainText.Length <= 0)
@@ -115,6 +102,11 @@ namespace MvcEncryptionLabData
             return Convert.ToBase64String(encrypted);
         }
 
+        public static string Decrypt(string cipherText, string iv)
+        {
+            return Decrypt(EncryptionKey, cipherText, iv);
+        }
+
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/system.security.cryptography.aescryptoserviceprovider.aspx
         /// </summary>
@@ -122,7 +114,7 @@ namespace MvcEncryptionLabData
         /// <param name="cipherText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        public static string Decrypt(string privateKey, string cipherText, string iv)
+        private static string Decrypt(string privateKey, string cipherText, string iv)
         {
             byte[] cipherTextAsBytes = Convert.FromBase64String(cipherText);
 

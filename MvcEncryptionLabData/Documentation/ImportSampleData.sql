@@ -12,3 +12,7 @@ USE Encryption
 --SELECT COUNT(*) FROM CaZipCodes
 --SELECT COUNT(*) FROM FirstNames
 --SELECT COUNT(*) FROM LastNames
+
+--DELETE FROM CaZipCodes
+--DELETE FROM FirstNames
+--DELETE FROM LastNames  

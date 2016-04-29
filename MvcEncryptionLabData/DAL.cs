@@ -9,42 +9,23 @@ namespace MvcEncryptionLabData
 {
     public class DAL
     {
-        private static ExpirableSecureValue _encryptionKey = new ExpirableSecureValue(300);
-
-        public static string EncryptionKey
+        public void AddPerson(Person person, string userName)
         {
-            set
-            {
-                _encryptionKey.Value = value;
-            }
+            // Check user has security key!
 
-            private get
-            {
-                if (!_encryptionKey.HasValue)
-                {
-                    throw new ApplicationException("Security key not available.");
-                }
-                return _encryptionKey.Value;
-            }
-        }
-
-        //private const string privateKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
-
-        public void AddPerson(Person person)
-        {
             using (DbEntities db = new DbEntities())
             {
                 string iv = "";
 
-                person.LastNameEncrypted = SecurityUtils.Encrypt(EncryptionKey, person.LastName, ref iv);
+                person.LastNameEncrypted = SecurityUtils.Encrypt(person.LastName, ref iv);
                 person.LastNameIV = iv;
 
-                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(EncryptionKey, person.Address.AddressLine1, ref iv);
+                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(person.Address.AddressLine1, ref iv);
                 person.Address.AddressLine1IV = iv;
 
                 person.SSNSalt = SecurityUtils.GetSalt();
                 person.SSNHash = SecurityUtils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = SecurityUtils.Encrypt(EncryptionKey, person.SSN, ref iv);
+                person.SSNEncrypted = SecurityUtils.Encrypt(person.SSN, ref iv);
                 person.SSNIV = iv;
                 db.Person.Add(person);
 
@@ -54,7 +35,7 @@ namespace MvcEncryptionLabData
             }
         }
 
-        public Person GetPersonById(int id)
+        public Person GetPersonById(int id, string userName)
         {
             using (DbEntities context = new DbEntities())
             {
@@ -69,14 +50,14 @@ namespace MvcEncryptionLabData
                     select p
                 ).FirstOrDefault();
 
-                person.LastName = SecurityUtils.Decrypt(EncryptionKey, person.LastNameEncrypted, person.LastNameIV);
-                person.SSN = SecurityUtils.Decrypt(EncryptionKey, person.SSNEncrypted, person.SSNIV);
+                person.LastName = SecurityUtils.Decrypt(person.LastNameEncrypted, person.LastNameIV);
+                person.SSN = SecurityUtils.Decrypt(person.SSNEncrypted, person.SSNIV);
 
                 return person;
             }
         }
 
-        public Person GetPersonBySSN(string ssn, string zipCode, string firstName)
+        public Person GetPersonBySSN(string ssn, string zipCode, string firstName, string userName)
         {
             using (DbEntities context = new DbEntities())
             {
@@ -102,8 +83,8 @@ namespace MvcEncryptionLabData
 
                         if (person.SSNHash.Equals(ssnToMatchHash))
                         {
-                            person.LastName = SecurityUtils.Decrypt(EncryptionKey, person.LastNameEncrypted, person.LastNameIV);
-                            person.SSN = SecurityUtils.Decrypt(EncryptionKey, person.SSNEncrypted, person.SSNIV);
+                            person.LastName = SecurityUtils.Decrypt(person.LastNameEncrypted, person.LastNameIV);
+                            person.SSN = SecurityUtils.Decrypt(person.SSNEncrypted, person.SSNIV);
                             return person;
                         }
                     }
@@ -145,12 +126,12 @@ namespace MvcEncryptionLabData
 
                 person.LastName = lastName.Value;
 
-                person.SSN = SecurityUtils.RandomSSN();
+                person.SSN = RandomUtils.RandomSSN();
 
                 Address address = new Address();
                 person.Address = address;
 
-                address.AddressLine1 = SecurityUtils.RandomString(25);
+                address.AddressLine1 = RandomUtils.RandomString(25);
 
                 int zipCodeId = random.Next(1, ZIP_CODE_COUNT);
 

@@ -37,7 +37,7 @@ namespace MvcEncryptionLabData
         public string Value { get; set; }
         public float Frequency { get; set; }
         public float CumulativeFrequency { get; set; }
-        public short Rank { get; set; }
+        public int Rank { get; set; }
     }
 
     public class FirstName
@@ -46,7 +46,35 @@ namespace MvcEncryptionLabData
         public string Value { get; set; }
         public float Frequency { get; set; }
         public float CumulativeFrequency { get; set; }
-        public short Rank { get; set; }
+        public int Rank { get; set; }
         public bool IsMale { get; set; }
+    }
+
+    public class RandomUtils
+    {
+        private static Random random;
+        private const string CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        private const string NUMBERS = "0123456789";
+
+        static RandomUtils()
+        {
+            random = new Random();
+        }
+
+        public static string RandomString(int length, string chars)
+        {
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static string RandomString(int length)
+        {
+            return RandomString(length, CHARS);
+        }
+
+        public static string RandomSSN()
+        {
+            return RandomString(9, NUMBERS);
+        }
     }
 }

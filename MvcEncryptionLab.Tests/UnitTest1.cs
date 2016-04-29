@@ -5,20 +5,25 @@ using MvcEncryptionLabData;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security;
+using System.Xml;
+using System.Xml.XPath;
 
 namespace MvcEncryptionLab.Tests
 {
     [TestClass]
     public class UnitTest1
     {
+        string encryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+
         [TestMethod]
         public void TestEncryption()
         {
-            string encryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+            SecurityUtils.EncryptionKey = encryptionKey;
+
             string plainText = "Steve was here but now he is gone";
             string iv = "";
-            string cipherText = SecurityUtils.Encrypt(encryptionKey, plainText, ref iv);
-            string decryptedText = SecurityUtils.Decrypt(encryptionKey, cipherText, iv);
+            string cipherText = SecurityUtils.Encrypt(plainText, ref iv);
+            string decryptedText = SecurityUtils.Decrypt(cipherText, iv);
 
             Assert.AreEqual(plainText, decryptedText);
         }
@@ -26,6 +31,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void AddPersons()
         {
+            SecurityUtils.EncryptionKey = encryptionKey;
+
             DAL dal = new DAL();
 
             Person p1 = new Person
@@ -41,7 +48,7 @@ namespace MvcEncryptionLab.Tests
                     Zip = "95691"
                 }
             };
-            dal.AddPerson(p1);
+            dal.AddPerson(p1, "schampeau");
 
             Person p2 = new Person
             {
@@ -56,7 +63,7 @@ namespace MvcEncryptionLab.Tests
                     Zip = "95814"
                 }
             };
-            dal.AddPerson(p2);
+            dal.AddPerson(p2, "schampeau");
 
             Person p3 = new Person
             {
@@ -71,7 +78,7 @@ namespace MvcEncryptionLab.Tests
                     Zip = "95984"
                 }
             };
-            dal.AddPerson(p3);
+            dal.AddPerson(p3, "schampeau");
         }
 
         [TestMethod]
@@ -85,7 +92,7 @@ namespace MvcEncryptionLab.Tests
 
                 Debug.WriteLine(String.Format("{0} - {1}", i, person.ToString()));
 
-                dal.AddPerson(person);
+                dal.AddPerson(person, "schampeau");
             }
         }
 
@@ -93,17 +100,17 @@ namespace MvcEncryptionLab.Tests
         public void TestGetPerson()
         {
             DAL dal = new DAL();
-            Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria");
+            Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria", "schampeau");
             Assert.AreEqual(person.LastName, "Hematoma");
         }
 
         [TestMethod]
         public void TestGetPersonSetSecurityKey()
         {
-            DAL.EncryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+            SecurityUtils.EncryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
 
             DAL dal = new DAL();
-            Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria");
+            Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria", "schampeau");
             Assert.AreEqual(person.LastName, "Hematoma");
         }
 
@@ -127,10 +134,10 @@ namespace MvcEncryptionLab.Tests
 
                 string iv = "";
                 // Encrypt the string to an array of bytes.
-                string encrypted = SecurityUtils.Encrypt(encryptionKey, original, ref iv);
+                string encrypted = SecurityUtils.Encrypt(original, ref iv);
 
                 // Decrypt the bytes to a string.
-                string roundtrip = SecurityUtils.Decrypt(encryptionKey, encrypted, iv);
+                string roundtrip = SecurityUtils.Decrypt(encrypted, iv);
 
                 Assert.AreEqual(original, roundtrip);
             }
@@ -183,6 +190,43 @@ namespace MvcEncryptionLab.Tests
             {
                 Assert.Fail(e.Message);
             }
+        }
+
+        [TestMethod]
+        public void TestXPath()
+        {
+            string manifestFile = @"C:\Users\slchampeau\Downloads\_ACA-IRS\TestScenario3_Manifest.xml";
+            XmlDocument document = new XmlDocument();
+            document.Load(manifestFile);
+            XPathNavigator navigator = document.CreateNavigator();
+
+            XmlNamespaceManager manager = new XmlNamespaceManager(navigator.NameTable);
+            manager.AddNamespace("uibizheader", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
+            manager.AddNamespace("bizheader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
+            manager.AddNamespace("air70", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
+            manager.AddNamespace("irscommon", "urn:us:gov:treasury:irs:common");
+
+            /*
+            <ACAUIBusinessHeader
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns="urn:us:gov:treasury:irs:msg:acauibusinessheader">
+
+              <ACABusinessHeader xmlns="urn:us:gov:treasury:irs:msg:acabusinessheader">
+                <UniqueTransmissionId xmlns="urn:us:gov:treasury:irs:ext:aca:air:7.0">5e34ed8e-f92f-42f6-ac65-8cd1eddabf23:SYS12:BB0KF::T</UniqueTransmissionId>
+                <Timestamp xmlns="urn:us:gov:treasury:irs:common">2016-01-23T13:41:09Z</Timestamp>
+              </ACABusinessHeader>
+            */
+
+            string xpath = "//uibizheader:ACAUIBusinessHeader/air70:ACATransmitterManifestReqDtl/irscommon:ChecksumAugmentationNum";
+
+
+            foreach (XPathNavigator nav in navigator.Select(xpath, manager))
+            {
+                nav.SetValue("Checksum");
+            }
+
+            document.Save(manifestFile);
         }
     }
 }
