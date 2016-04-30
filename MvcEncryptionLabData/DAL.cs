@@ -99,7 +99,7 @@ namespace MvcEncryptionLabData
         private const int FIRST_NAME_COUNT = 5494;
         private const int LAST_NAME_COUNT = 88799;
         private const int ZIP_CODE_COUNT = 2664;
-        private const int ZIP_CODE_TOTAL_POP = 37187934
+        private const int ZIP_CODE_TOTAL_POP = 37187934;
 
         public Person GetRandomPerson()
         {
