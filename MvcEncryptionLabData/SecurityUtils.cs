@@ -31,6 +31,11 @@ namespace MvcEncryptionLabData
 
         public static void SetUserEncryptionKey(string user, string value)
         {
+            SetUserEncryptionKey(user, value, 300);
+        }
+
+        public static void SetUserEncryptionKey(string user, string value, int expireInSeconds)
+        {
             ExpirableSecureValue secureValue;
             _encryptionKeys.TryGetValue(user, out secureValue);
 
@@ -39,9 +44,24 @@ namespace MvcEncryptionLabData
                 _encryptionKeys.Remove(user);
             }
 
-            ExpirableSecureValue newSecureValue = new ExpirableSecureValue(300);
+            ExpirableSecureValue newSecureValue = new ExpirableSecureValue(expireInSeconds);
             newSecureValue.Value = value;
             _encryptionKeys.Add(user, newSecureValue);
+        }
+
+        public static bool UserHasEncryptionKey(string user)
+        {
+            ExpirableSecureValue secureValue;
+            _encryptionKeys.TryGetValue(user, out secureValue);
+
+            if (secureValue == null || !secureValue.HasValue)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public static void LockUserEncryptionKey(string user, bool isLocked)
@@ -305,6 +325,9 @@ namespace MvcEncryptionLabData
             }
         }
 
+        /// <summary>
+        /// By calling the Value property this is also checking to see if key has expired!
+        /// </summary>
         public Boolean HasValue
         {
             get
