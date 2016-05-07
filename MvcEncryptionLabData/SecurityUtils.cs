@@ -10,8 +10,16 @@ using System.Threading.Tasks;
 
 namespace MvcEncryptionLabData
 {
+    // TODO: Validate encryption key
+    //       > Choose phrase to store as check in database
+    //       > When key used for first time, encrypt phrase with key, store IV and encrypted value in database
+    //       > On all subsequent key entries, decrypt phrase and display to user
+    //       > Prompt user if decrypted phrase is accurate, proceed with encrypt/decrypt
+
     public class SecurityUtils
     {
+        #region Encryption Key
+
         private static Dictionary<string, ExpirableSecureValue> _encryptionKeys = new Dictionary<string, ExpirableSecureValue>();
 
         public static string GetUserEncryptionKey(string user)
@@ -21,7 +29,8 @@ namespace MvcEncryptionLabData
 
             if (secureValue == null || !secureValue.HasValue)
             {
-                throw new ApplicationException("Security key not available.");
+                return null;
+                //throw new ApplicationException("Security key not available.");
             }
             else
             {
@@ -75,7 +84,17 @@ namespace MvcEncryptionLabData
             }
         }
 
+        public static bool ValidateEncryptionKeyFormat(string user, string key)
+        {
+            // TODO: ValidateEncryptionKey() - validate encryption key format
+            // No white spaces
+            // RegEx for key value?
+            return true;
+        }
+
         public static string EncryptionKeyTestingOnly { get; set; }
+
+        #endregion 
 
         private static RNGCryptoServiceProvider crypto;
 
@@ -114,9 +133,17 @@ namespace MvcEncryptionLabData
             return Convert.ToBase64String(hashedBytes);
         }
 
-        public static string Encrypt(string plainText, ref string iv, string user)
+        #region Encrypt
+
+        public static string Encrypt(string plainText, ref string iv, string userName)
         {
-            return _Encrypt(EncryptionKeyTestingOnly, plainText, ref iv);
+            string key = GetUserEncryptionKey(userName);
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ApplicationException(String.Format("No key found for user '{0}'.", userName));
+            }
+
+            return _Encrypt(key, plainText, ref iv);
         }
 
         /// <summary>
@@ -165,9 +192,19 @@ namespace MvcEncryptionLabData
             return Convert.ToBase64String(encrypted);
         }
 
-        public static string Decrypt(string cipherText, string iv, string user)
+        #endregion
+
+        #region Decrypt
+
+        public static string Decrypt(string cipherText, string iv, string userName)
         {
-            return _Decrypt(EncryptionKeyTestingOnly, cipherText, iv);
+            string key = GetUserEncryptionKey(userName);
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ApplicationException(String.Format("No key found for user '{0}'.", userName));
+            }
+
+            return _Decrypt(key, cipherText, iv);
         }
 
         /// <summary>
@@ -220,6 +257,8 @@ namespace MvcEncryptionLabData
             }
             return plaintext;
         }
+
+        #endregion
     }
 
     public static class SecurityExtensions

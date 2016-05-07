@@ -9,6 +9,62 @@ namespace MvcEncryptionLabData
 {
     public class DAL
     {
+        public bool IsCheckPhrase()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                return (
+                    from c in db.CheckPhrase
+                    select c
+                ).Any();
+            }
+        }
+
+        public string GetCheckPhrase(string userName)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                EncryptedCheckPhrase cp =
+                (
+                    from c in db.CheckPhrase
+                    select c
+                ).FirstOrDefault();
+
+                if (cp == null)
+                {
+                    throw new ApplicationException("GetCheckPhrase() - no check phrase defined.");
+                }
+
+                string valueDecrypted = cp.CheckPhrase = SecurityUtils.Decrypt(
+                    cp.CheckPhraseEncrypted,
+                    cp.CheckPhraseIV,
+                    userName
+                );
+
+                return valueDecrypted;
+            }
+        }
+
+        public void SetCheckPhrase(string userName, string value)
+        {
+            string iv = "";
+            string encryptedValue = SecurityUtils.Encrypt(
+                value,
+                ref iv,
+                userName
+            );
+
+            using (DbEntities db = new DbEntities())
+            {
+                EncryptedCheckPhrase cp = new EncryptedCheckPhrase();
+                cp.CheckPhraseEncrypted = encryptedValue;
+                cp.CheckPhraseIV = iv;
+
+                db.CheckPhrase.Add(cp);
+                db.SaveChanges();
+            }
+        }
+
         public void AddPerson(Person person, string userName)
         {
             // Check user has security key!

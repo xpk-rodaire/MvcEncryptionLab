@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="CheckPhrase.cs" />
     <Compile Include="Random.cs" />
     <Compile Include="DAL.cs" />
     <Compile Include="DbEntities.cs" />

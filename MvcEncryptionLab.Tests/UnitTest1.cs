@@ -107,7 +107,7 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestGetPersonSetSecurityKey()
         {
-            SecurityUtils.EncryptionKeyTestingOnly = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+            SecurityUtils.EncryptionKeyTestingOnly = encryptionKey;
 
             DAL dal = new DAL();
             Person person = dal.GetPersonBySSN("0099009900", "95984", "Gloria", "schampeau");
@@ -129,7 +129,7 @@ namespace MvcEncryptionLab.Tests
         {
             try
             {
-                string encryptionKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+                SecurityUtils.EncryptionKeyTestingOnly = encryptionKey;
                 string original = "Here is some data to encrypt!";
 
                 string iv = "";
@@ -227,6 +227,50 @@ namespace MvcEncryptionLab.Tests
             }
 
             document.Save(manifestFile);
+        }
+
+        string userName = "schampea";
+
+        [TestMethod]
+        public void TestEncryptionKeyExpire()
+        {
+            SecurityUtils.SetUserEncryptionKey(userName, "ThisIsATestKey", 5);
+
+            System.Threading.Thread.Sleep(5000);
+
+            Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
+
+            SecurityUtils.SetUserEncryptionKey(userName, "ThisIsATestKey", 2);
+
+            SecurityUtils.LockUserEncryptionKey(userName, true);
+
+            System.Threading.Thread.Sleep(12000);
+
+            Assert.IsTrue(SecurityUtils.UserHasEncryptionKey(userName));
+
+            SecurityUtils.LockUserEncryptionKey(userName, false);
+
+            Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
+        }
+
+        string checkPhrase = "Four score and seven years ago...";
+
+        [TestMethod]
+        public void TestSetCheckPhrase()
+        {
+            SecurityUtils.SetUserEncryptionKey(userName, encryptionKey, 5);
+            DAL dal = new DAL();
+            dal.SetCheckPhrase(userName, checkPhrase);
+            Assert.IsTrue(dal.IsCheckPhrase());
+        }
+
+        [TestMethod]
+        public void TestGetCheckPhrase()
+        {
+            SecurityUtils.SetUserEncryptionKey(userName, encryptionKey, 5);
+            DAL dal = new DAL();
+            string decryptedCheckPhrase = dal.GetCheckPhrase(userName);
+            Assert.AreEqual(checkPhrase, decryptedCheckPhrase);
         }
     }
 }
