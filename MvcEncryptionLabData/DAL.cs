@@ -32,7 +32,8 @@ namespace MvcEncryptionLabData
 
                 if (cp == null)
                 {
-                    throw new ApplicationException("GetCheckPhrase() - no check phrase defined.");
+                    return null;
+                    //throw new ApplicationException("GetCheckPhrase() - no check phrase defined.");
                 }
 
                 string valueDecrypted = cp.CheckPhrase = SecurityUtils.Decrypt(

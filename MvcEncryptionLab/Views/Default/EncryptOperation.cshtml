@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "EncryptOperation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Encrypt Operation</h2>
+
+<input type="hidden" id="promptForKey" data-value="@ViewBag.PromptForKey" />
+
+@section scripts
+{
+    <script>
+        if ($("#promptForKey").data("value")) {
+            promptForKey();
+        }
+    </script>
+}
+

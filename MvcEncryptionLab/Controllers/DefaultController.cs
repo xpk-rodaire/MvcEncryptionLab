@@ -9,10 +9,17 @@ namespace MvcEncryptionLab.Controllers
 {
     public class DefaultController : Controller
     {
-        string userName = "schampea"; 
+        string userName = "schampea";
 
         // GET: Default
         public ActionResult Index()
+        {
+            // Does user have security key entered?
+
+            return View();
+        }
+
+        public ActionResult EncryptOperation()
         {
             // Does user have security key entered?
             ViewBag.PromptForKey = (SecurityUtils.UserHasEncryptionKey(userName) ? 0 : 1);
@@ -37,15 +44,37 @@ namespace MvcEncryptionLab.Controllers
                 // Use encryption key to decrypt check phrase
                 string checkPhrase = dal.GetCheckPhrase(userName);
 
-                // Display decrypted pass phrase to user for verification
-
-                return this.Json(new { status = "success", checkPhrase = checkPhrase });
+                // Check phrase not entered yet
+                if (checkPhrase == null)
+                {
+                    return this.Json(new { status = "PromptForPassPhrase", message = String.Empty });
+                }
+                else
+                {
+                    // Display decrypted pass phrase to user for verification
+                    return this.Json(new { status = "ValidatePassPhrase", message = checkPhrase });
+                }
             }
         }
 
         public ActionResult PostCheckPhraseResponse(bool value)
         {
-            return null;
+            if (value == false)
+            {
+                // User rejected check phrase comparison - redirect to home page
+            }
+            return this.Json(new { status = "success" }); ;
+        }
+
+        public ActionResult PostCheckPhrase(string value)
+        {
+            // Is value long enough?
+
+            DAL dal = new DAL();
+            // Use encryption key to decrypt check phrase
+            dal.SetCheckPhrase(userName, value);
+
+            return this.Json(new { status = "success" });
         }
     }
 }

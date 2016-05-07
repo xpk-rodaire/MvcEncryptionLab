@@ -5,13 +5,6 @@
 
 <h2>View</h2>
 
-<input type="hidden" id="promptForKey" data-value="@ViewBag.PromptForKey" />
+<h4>This is the home page!</h4>
 
-@section scripts
-{
-    <script>
-        if ($("#promptForKey").data("value")) {
-            promptForKey();
-        }
-    </script>
-}
+@Html.ActionLink("Encrypt/Decrypt Operation", "EncryptOperation")
