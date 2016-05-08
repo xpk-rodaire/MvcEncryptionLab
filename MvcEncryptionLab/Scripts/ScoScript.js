@@ -4,12 +4,12 @@ function promptForKey() {
         closable: false,
         size: BootstrapDialog.SIZE_LARGE,
         title: 'ACA-IRS File Processer',
-        message: 'Please enter key: <input type="text" class="form-control">',
+        message: 'Please enter security key: <textarea class="form-control" rows="1" style="min-width: 100%" ></textarea>',
         buttons: [
             {
                 label: 'OK',
                 action: function (dialogRef) {
-                    var key = dialogRef.getModalBody().find('input').val();
+                    var key = dialogRef.getModalBody().find('textarea').val();
                     if ($.trim(key.toLowerCase()) === '') {
                         alert('Please enter a value or press Cancel.');
                         return false;
@@ -29,29 +29,42 @@ function promptForKey() {
                                 BootstrapDialog.show({
                                     closable: false,
                                     title: 'ACA-IRS File Processer',
-                                    message: 'Is this phrase correct? <input type="text" class="form-control" readonly value="' + data.checkPhrase + '">',
+                                    message: 'Does this match the phrase originally entered?'
+                                        + '<fieldset class="form-group">'
+                                        + '   <label for="securityKey">Security Key Entered</label>'
+                                        + '   <textarea class="form-control" id="securityKey" rows="1" style="min-width: 100%" readonly>' + data.key + '</textarea>'
+                                        + '   <label for="phrase">Decrypted Phrase</label>'
+                                        + '   <textarea class="form-control" id="phrase" rows="3" style="min-width: 100%" readonly>' + data.phrase + '</textarea>'
+                                        + '</fieldset>',
                                     buttons: [
                                         {
                                             label: 'Yes',
                                             action: function (dialogRef) {
-                                                $.ajax({
-                                                    url: "/Default/PostCheckPhraseResponse/",
-                                                    type: "POST",
-                                                    data: { 'value': true },
-                                                    dataType: "json",
-                                                    success: function (data) { }
-                                                });
+                                                dialogRef.close();
+                                                //$.ajax({
+                                                //    url: "/Default/PostCheckPhraseResponse/",
+                                                //    type: "POST",
+                                                //    data: { 'value': true },
+                                                //    dataType: "json",
+                                                //    success: function (data) {
+
+                                                //    }
+                                                //});
                                             }
                                         },
                                         {
+                                            // User indicates phrase does not match - expire user's security key
                                             label: 'No',
                                             action: function (dialogRef) {
+                                                alert("Please review the security key entered and try again.");
+                                                dialogRef.close();
                                                 $.ajax({
                                                     url: "/Default/PostCheckPhraseResponse/",
                                                     type: "POST",
                                                     data: { 'value': false },
                                                     dataType: "json",
-                                                    success: function (data) { }
+                                                    success: function (data) {
+                                                    }
                                                 });
                                             }
                                         }
@@ -63,12 +76,21 @@ function promptForKey() {
                                 BootstrapDialog.show({
                                     closable: false,
                                     title: 'ACA-IRS File Processer',
-                                    message: 'Please enter pass phrase <input type="text" class="form-control"/>',
+                                    message: 'Please enter a phrase that will be used to validate future entires of the security key (minimum size 100 characters):<input type="text" class="form-control"/>',
                                     buttons: [
                                         {
                                             label: 'OK',
                                             action: function (dialogRef) {
                                                 var phrase = dialogRef.getModalBody().find('input').val();
+
+                                                if ($.trim(key.toLowerCase()) === '') {
+                                                    alert('Please enter a value or press Cancel.');
+                                                    return false;
+                                                }
+                                                else if (phrase.length < 100) {
+                                                    alert('Please enter a value at least 100 characters in length.');
+                                                    return false;
+                                                }
 
                                                 $.ajax({
                                                     url: "/Default/PostCheckPhrase/",
@@ -82,10 +104,11 @@ function promptForKey() {
                                             }
                                         },
                                         {
+                                            // Cancel entry of phrase
                                             label: 'Cancel',
-                                            // TODO: redirect to home page
                                             action: function (dialogRef) {
-
+                                                dialogRef.close();
+                                                // TODO: redirect to home page
                                             }
                                         }
                                     ]
@@ -93,8 +116,8 @@ function promptForKey() {
                             }
                             else
                             {
+                                alert("Invalid response from server - please contact ISD support.");
                                 // TODO: redirect to home page
-                                alert("Unknown status");
                             }
                         },
                         error: function (xhr, httpStatusMessage, customErrorMessage) {
@@ -105,10 +128,11 @@ function promptForKey() {
                 }
             },
             {
+                // Cancel entry of security key
                 label: 'Cancel',
                 action: function (dialogRef) {
-                    // TODO: redirect to home page
                     dialogRef.close();
+                    // TODO: redirect to home page
                 }
             }
         ]

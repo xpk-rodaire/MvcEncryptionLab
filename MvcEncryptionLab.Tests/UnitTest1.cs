@@ -240,6 +240,8 @@ namespace MvcEncryptionLab.Tests
 
             Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
 
+            //////////////////////
+
             SecurityUtils.SetUserEncryptionKey(userName, "ThisIsATestKey", 2);
 
             SecurityUtils.LockUserEncryptionKey(userName, true);
@@ -249,6 +251,14 @@ namespace MvcEncryptionLab.Tests
             Assert.IsTrue(SecurityUtils.UserHasEncryptionKey(userName));
 
             SecurityUtils.LockUserEncryptionKey(userName, false);
+
+            Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
+
+            //////////////////////
+
+            SecurityUtils.SetUserEncryptionKey(userName, "ThisIsATestKey", 5000);
+
+            SecurityUtils.ExpireUserEncryptionKey(userName);
 
             Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
         }

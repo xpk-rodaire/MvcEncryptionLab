@@ -14,6 +14,7 @@ namespace MvcEncryptionLabData
     //       > Choose phrase to store as check in database
     //       > When key used for first time, encrypt phrase with key, store IV and encrypted value in database
     //       > On all subsequent key entries, decrypt phrase and display to user
+    //            When entering security key, 
     //       > Prompt user if decrypted phrase is accurate, proceed with encrypt/decrypt
 
     public class SecurityUtils
@@ -29,6 +30,7 @@ namespace MvcEncryptionLabData
 
             if (secureValue == null || !secureValue.HasValue)
             {
+                _encryptionKeys.Remove(user);
                 return null;
                 //throw new ApplicationException("Security key not available.");
             }
@@ -70,6 +72,18 @@ namespace MvcEncryptionLabData
             else
             {
                 return true;
+            }
+        }
+
+        public static void ExpireUserEncryptionKey(string user)
+        {
+            ExpirableSecureValue secureValue;
+            _encryptionKeys.TryGetValue(user, out secureValue);
+
+            if (secureValue != null && secureValue.HasValue)
+            {
+                secureValue.Expire();
+                _encryptionKeys.Remove(user);
             }
         }
 
@@ -314,6 +328,13 @@ namespace MvcEncryptionLabData
             }
 
             this._expireInSeconds = expireInSeconds;
+        }
+
+        public void Expire()
+        {
+            this._value.Dispose();
+            this._value = null;
+            this.IsLocked = false;
         }
 
         public bool IsLocked

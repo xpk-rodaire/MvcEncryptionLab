@@ -28,7 +28,7 @@ namespace MvcEncryptionLab.Controllers
 
         public ActionResult PostEncryptionKey(string key)
         {
-            // Re-validate key, pass back FAIL
+            // Re-validate key format, pass back FAIL
             if (!SecurityUtils.ValidateEncryptionKeyFormat(userName, key))
             {
                 //
@@ -52,7 +52,7 @@ namespace MvcEncryptionLab.Controllers
                 else
                 {
                     // Display decrypted pass phrase to user for verification
-                    return this.Json(new { status = "ValidatePassPhrase", message = checkPhrase });
+                    return this.Json(new { status = "ValidatePassPhrase", message = String.Empty, key = key, phrase = checkPhrase });
                 }
             }
         }
@@ -62,8 +62,10 @@ namespace MvcEncryptionLab.Controllers
             if (value == false)
             {
                 // User rejected check phrase comparison - redirect to home page
+                SecurityUtils.ExpireUserEncryptionKey(userName);
+                return View("Index");
             }
-            return this.Json(new { status = "success" }); ;
+            return this.Json(new { status = "success" });
         }
 
         public ActionResult PostCheckPhrase(string value)
