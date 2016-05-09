@@ -17,6 +17,11 @@ namespace MvcEncryptionLabData
     //            When entering security key, 
     //       > Prompt user if decrypted phrase is accurate, proceed with encrypt/decrypt
 
+    // If no check phrase in system, prompt for both key and phrase
+    // Prompt for key 2nd time
+    // Is phrase correct?
+    //     N - 
+
     public class SecurityUtils
     {
         #region Encryption Key
@@ -98,7 +103,7 @@ namespace MvcEncryptionLabData
             }
         }
 
-        public static bool ValidateEncryptionKeyFormat(string user, string key)
+        public static bool ValidateEncryptionKeyFormat(string key)
         {
             // TODO: ValidateEncryptionKey() - validate encryption key format
             // No white spaces
@@ -148,6 +153,13 @@ namespace MvcEncryptionLabData
         }
 
         #region Encrypt
+
+        public static string Encrypt(string plainText, ref string iv)
+        {
+            // TODO: get user name
+            string userName = "";
+            return Encrypt(plainText, ref iv, userName);
+        }
 
         public static string Encrypt(string plainText, ref string iv, string userName)
         {
@@ -210,7 +222,14 @@ namespace MvcEncryptionLabData
 
         #region Decrypt
 
-        public static string Decrypt(string cipherText, string iv, string userName)
+        public static string Decrypt(string cipherText, string iv)
+        {
+            // TODO: get user name
+            string userName = "";
+            return DecryptWithUserName(cipherText, iv, userName);
+        }
+
+        public static string DecryptWithUserName(string cipherText, string iv, string userName)
         {
             string key = GetUserEncryptionKey(userName);
             if (string.IsNullOrEmpty(key))
@@ -218,7 +237,7 @@ namespace MvcEncryptionLabData
                 throw new ApplicationException(String.Format("No key found for user '{0}'.", userName));
             }
 
-            return _Decrypt(key, cipherText, iv);
+            return DecryptWithKey(key, cipherText, iv);
         }
 
         /// <summary>
@@ -228,7 +247,7 @@ namespace MvcEncryptionLabData
         /// <param name="cipherText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        private static string _Decrypt(string privateKey, string cipherText, string iv)
+        public static string DecryptWithKey(string privateKey, string cipherText, string iv)
         {
             byte[] cipherTextAsBytes = Convert.FromBase64String(cipherText);
 

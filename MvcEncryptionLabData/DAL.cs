@@ -20,7 +20,7 @@ namespace MvcEncryptionLabData
             }
         }
 
-        public string GetCheckPhrase(string userName)
+        public string GetCheckPhrase(string key)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -36,10 +36,10 @@ namespace MvcEncryptionLabData
                     //throw new ApplicationException("GetCheckPhrase() - no check phrase defined.");
                 }
 
-                string valueDecrypted = cp.CheckPhrase = SecurityUtils.Decrypt(
+                string valueDecrypted = cp.CheckPhrase = SecurityUtils.DecryptWithKey(
+                    key,
                     cp.CheckPhraseEncrypted,
-                    cp.CheckPhraseIV,
-                    userName
+                    cp.CheckPhraseIV
                 );
 
                 return valueDecrypted;
@@ -107,8 +107,8 @@ namespace MvcEncryptionLabData
                     select p
                 ).FirstOrDefault();
 
-                person.LastName = SecurityUtils.Decrypt(person.LastNameEncrypted, person.LastNameIV, userName);
-                person.SSN = SecurityUtils.Decrypt(person.SSNEncrypted, person.SSNIV, userName);
+                person.LastName = SecurityUtils.DecryptWithUserName(person.LastNameEncrypted, person.LastNameIV, userName);
+                person.SSN = SecurityUtils.DecryptWithUserName(person.SSNEncrypted, person.SSNIV, userName);
 
                 return person;
             }
@@ -140,8 +140,8 @@ namespace MvcEncryptionLabData
 
                         if (person.SSNHash.Equals(ssnToMatchHash))
                         {
-                            person.LastName = SecurityUtils.Decrypt(person.LastNameEncrypted, person.LastNameIV, userName);
-                            person.SSN = SecurityUtils.Decrypt(person.SSNEncrypted, person.SSNIV, userName);
+                            person.LastName = SecurityUtils.DecryptWithUserName(person.LastNameEncrypted, person.LastNameIV, userName);
+                            person.SSN = SecurityUtils.DecryptWithUserName(person.SSNEncrypted, person.SSNIV, userName);
                             return person;
                         }
                     }

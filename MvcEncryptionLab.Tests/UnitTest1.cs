@@ -23,7 +23,7 @@ namespace MvcEncryptionLab.Tests
             string plainText = "Steve was here but now he is gone";
             string iv = "";
             string cipherText = SecurityUtils.Encrypt(plainText, ref iv, "");
-            string decryptedText = SecurityUtils.Decrypt(cipherText, iv, "");
+            string decryptedText = SecurityUtils.DecryptWithUserName(cipherText, iv, "");
 
             Assert.AreEqual(plainText, decryptedText);
         }
@@ -137,7 +137,7 @@ namespace MvcEncryptionLab.Tests
                 string encrypted = SecurityUtils.Encrypt(original, ref iv, "");
 
                 // Decrypt the bytes to a string.
-                string roundtrip = SecurityUtils.Decrypt(encrypted, iv, "");
+                string roundtrip = SecurityUtils.DecryptWithUserName(encrypted, iv, "");
 
                 Assert.AreEqual(original, roundtrip);
             }

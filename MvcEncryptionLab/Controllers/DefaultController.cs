@@ -22,6 +22,8 @@ namespace MvcEncryptionLab.Controllers
         public ActionResult EncryptOperation()
         {
             // Does user have security key entered?
+            DAL dal = new DAL();
+            ViewBag.CheckPhrase = (dal.IsCheckPhrase() ? 0 : 1);
             ViewBag.PromptForKey = (SecurityUtils.UserHasEncryptionKey(userName) ? 0 : 1);
             return View();
         }
@@ -38,34 +40,21 @@ namespace MvcEncryptionLab.Controllers
             }
             else
             {
-                SecurityUtils.SetUserEncryptionKey(userName, key);
-
                 DAL dal = new DAL();
                 // Use encryption key to decrypt check phrase
-                string checkPhrase = dal.GetCheckPhrase(userName);
+                string checkPhrase = dal.GetCheckPhrase(key);
 
                 // Check phrase not entered yet
                 if (checkPhrase == null)
                 {
-                    return this.Json(new { status = "PromptForPassPhrase", message = String.Empty });
+                    return this.Json(new { status = "PromptForCheckPhrase", message = String.Empty });
                 }
                 else
                 {
                     // Display decrypted pass phrase to user for verification
-                    return this.Json(new { status = "ValidatePassPhrase", message = String.Empty, key = key, phrase = checkPhrase });
+                    return this.Json(new { status = "ValidateCheckPhrase", message = String.Empty, key = key, phrase = checkPhrase });
                 }
             }
-        }
-
-        public ActionResult PostCheckPhraseResponse(bool value)
-        {
-            if (value == false)
-            {
-                // User rejected check phrase comparison - redirect to home page
-                SecurityUtils.ExpireUserEncryptionKey(userName);
-                return View("Index");
-            }
-            return this.Json(new { status = "success" });
         }
 
         public ActionResult PostCheckPhrase(string value)
@@ -77,6 +66,53 @@ namespace MvcEncryptionLab.Controllers
             dal.SetCheckPhrase(userName, value);
 
             return this.Json(new { status = "success" });
+        }
+
+        public ActionResult PostCheckPhraseResponse(string key)
+        {
+            // User rejected check phrase comparison - redirect to home page
+            SecurityUtils.SetUserEncryptionKey(userName, key);
+            return this.Json(new { status = "success" });
+        }
+
+        public ActionResult PostSecurityItems(string key, string phrase)
+        {
+            DAL dal = new DAL();
+            bool isCheckPhrase = dal.IsCheckPhrase();
+
+            // Error if already a check phrase
+            if (isCheckPhrase != string.IsNullOrEmpty(phrase))
+            {
+                return new HttpStatusCodeResult(400, "Error processing check phrase.");
+            }
+
+            // Validate phrase
+            //if (2 ! 3)
+            //{
+            //    return new HttpStatusCodeResult(400, "Invalid phrase format");
+            //}
+
+            // Validate key
+            if (!SecurityUtils.ValidateEncryptionKeyFormat(key))
+            {
+                //
+                // https://visualstudiomagazine.com/blogs/tool-tracker/2015/10/return-server-side-errors-ajax.aspx
+                //
+                return new HttpStatusCodeResult(400, "Invalid security key format.");
+            }
+
+            // Use encryption key to decrypt check phrase
+
+
+
+            string checkPhrase = dal.GetCheckPhrase(key);
+
+            {
+                // Display decrypted pass phrase to user for verification
+                return this.Json(new { status = "ValidateCheckPhrase", message = String.Empty, key = key, phrase = checkPhrase });
+            }
+
+            return RedirectToAction("Index"); 
         }
     }
 }
