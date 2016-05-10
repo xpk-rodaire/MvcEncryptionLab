@@ -1,7 +1,7 @@
 ﻿
 var testKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
 
-function promptForKey(keyExists) {
+function promptForKey(keyExists, controllerName) {
 
     if (!keyExists) {
         BootstrapDialog.show({
@@ -26,18 +26,19 @@ function promptForKey(keyExists) {
                                 return false;
                             }
                             $.ajax({
-                                url: "/Default/PostSecurityKey",
+                                url: "/" + controllerName + "/PostSecurityKey",
                                 type: "POST",
                                 data: { 'key': key1 },
                                 dataType: "json",
                                 success: function (data) {
-                                    alert("Hash of key has been saved to database and will be used to validate future entires of the key.");
+                                    showDialog('Hash of key has been saved to database and will be used to validate future entries of the key.');
                                 },
                                 error: function (xhr, httpStatusMessage, customErrorMessage) {
-                                    alert("Error processing security key: " + customErrorMessage);
+                                    alert('Error processing security key: ' + customErrorMessage);
                                     gotoHomePage();
                                 }
                             });
+                            dialogRef.close();
                             
                         } else {
                             alert("Key values do not match.");
@@ -61,7 +62,7 @@ function promptForKey(keyExists) {
             closable: false,
             size: BootstrapDialog.SIZE_LARGE,
             title: 'ACA-IRS File Processer',
-            message: 'Please enter security key: <textarea class="form-control" id="key" rows="1" style="min-width: 100%" ></textarea>',
+            message: 'Please enter security key: <textarea class="form-control" id="key" rows="1" style="min-width: 100%" >' + testKey + '</textarea>',
             buttons: [
                 {
                     label: 'OK',
@@ -73,14 +74,15 @@ function promptForKey(keyExists) {
                         }
 
                         $.ajax({
-                            url: "/Default/PostSecurityKey",
+                            url: "/" + controllerName + "/PostSecurityKey",
                             type: "POST",
                             data: { 'key': key },
                             dataType: "json",
                             success: function (data) {
+                                showDialog('Security key valid.');
                             },
                             error: function (xhr, httpStatusMessage, customErrorMessage) {
-                                alert("Error processing security key: " + customErrorMessage);
+                                alert('Error processing security key: ' + customErrorMessage);
                                 gotoHomePage();
                             }
                         });
@@ -98,6 +100,21 @@ function promptForKey(keyExists) {
             ]
         });
     }
+}
+
+function showDialog(message) {
+    BootstrapDialog.show({
+        closable: false,
+        title: 'ACA-IRS File Processer',
+        message: message,
+        buttons: [
+        {
+            label: 'OK',
+            action: function (dialogRef) {
+                dialogRef.close();
+            }
+        }]
+    });
 }
 
 function gotoHomePage() {

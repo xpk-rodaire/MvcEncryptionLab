@@ -107,6 +107,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ApplicationController.cs" />
+    <Compile Include="Controllers\Default2Controller.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -124,6 +126,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Default\EncryptOperation.cshtml" />
+    <Content Include="Views\Default\NoEncryptOperation.cshtml" />
+    <Content Include="Views\Default2\EncryptOperation.cshtml" />
+    <Content Include="Views\Default2\NoEncryptOperation.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -134,6 +139,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\Application\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MvcEncryptionLabData\MvcEncryptionLabData.csproj">
