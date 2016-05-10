@@ -10,17 +10,6 @@ using System.Threading.Tasks;
 
 namespace MvcEncryptionLabData
 {
-    // TODO: Validate encryption key
-    //       > Choose phrase to store as check in database
-    //       > When key used for first time, encrypt phrase with key, store IV and encrypted value in database
-    //       > On all subsequent key entries, decrypt phrase and display to user
-    //            When entering security key, 
-    //       > Prompt user if decrypted phrase is accurate, proceed with encrypt/decrypt
-
-    // If no check phrase in system, prompt for both key and phrase
-    // Prompt for key 2nd time
-    // Is phrase correct?
-    //     N - 
 
     public class SecurityUtils
     {
@@ -105,9 +94,16 @@ namespace MvcEncryptionLabData
 
         public static bool ValidateEncryptionKeyFormat(string key)
         {
-            // TODO: ValidateEncryptionKey() - validate encryption key format
-            // No white spaces
-            // RegEx for key value?
+            if (string.IsNullOrEmpty(key))
+            {
+                return false;
+            }
+
+            if (key.Any(x => Char.IsWhiteSpace(x)))
+            {
+                return false;
+            }
+
             return true;
         }
 

@@ -58,6 +58,7 @@
     <Compile Include="Random.cs" />
     <Compile Include="DAL.cs" />
     <Compile Include="DbEntities.cs" />
+    <Compile Include="SecurityKey.cs" />
     <Compile Include="SecurityUtils.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,6 +78,7 @@
     <Content Include="Documentation\ImportSampleData.sql" />
     <Content Include="Documentation\LastName.sql" />
     <Content Include="Documentation\MaleFirstName.sql" />
+    <Content Include="Documentation\Security Key.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

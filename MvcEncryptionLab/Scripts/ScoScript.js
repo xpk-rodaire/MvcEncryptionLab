@@ -1,54 +1,51 @@
 ﻿
 var testKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
-var testPhrase = "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time. Thomas A. Edison";
 
-function promptForKey(promptForCheckPhrase) {
+function promptForKey(keyExists) {
 
-    if (promptForCheckPhrase) {
+    if (!keyExists) {
         BootstrapDialog.show({
             closable: false,
             title: 'ACA-IRS File Processer',
-            message: 'Please enter security key and phrase that will be used to validate future entires of the security key (minimum length 100 characters):'
+            message: 'This is the first time a security key has been entered. Please enter the value twice below.'
                 + '<fieldset class="form-group">'
-                + '   <label for="securityKey">Security Key</label>'
-                + '   <textarea class="form-control" id="securityKey" rows="1" style="min-width: 100%">' + testKey + '</textarea>'
-                + '   <label for="phrase">Phrase</label>'
-                + '   <textarea class="form-control" id="phrase" rows="3" style="min-width: 100%">' + testPhrase + '</textarea>'
+                + '   <label for="key1">Security Key</label>'
+                + '   <textarea class="form-control" id="key1" rows="1" style="min-width: 100%">' + testKey + '</textarea>'
+                + '   <label for="key2">Re-enter Security Key</label>'
+                + '   <textarea class="form-control" id="key2" rows="1" style="min-width: 100%">' + testKey + '</textarea>'
                 + '</fieldset>',
-
             buttons: [
                 {
                     label: 'OK',
                     action: function (dialogRef) {
-                        var key = dialogRef.getModalBody().find('textarea').val();
-                        var phrase = dialogRef.getModalBody().find('textarea').val();
+                        var key1 = dialogRef.getModalBody().find('#key1').val();
+                        var key2 = dialogRef.getModalBody().find('#key2').val();
 
-                        if (!validateKey(key)) {
-                            return false;
-                        }
-
-                        if (!validatePhrase(phrase)) {
-                            return false;
-                        }
-
-                        dialogRef.close();
-
-                        $.ajax({
-                            url: "/Default/PostSecurityItems/",
-                            type: "POST",
-                            data: { 'key': key, 'value': phrase },
-                            dataType: "json",
-                            success: function (data) {
-                                alert("Hello");
-                            },
-                            error: function (xhr, httpStatusMessage, customErrorMessage) {
-                                alert("Status = " + xhr.status + ", Message = " + customErrorMessage);
+                        if (key1 === key2) {
+                            if (!validateKey(key1)) {
+                                return false;
                             }
-                        });
+                            $.ajax({
+                                url: "/Default/PostSecurityKey",
+                                type: "POST",
+                                data: { 'key': key1 },
+                                dataType: "json",
+                                success: function (data) {
+                                    alert("Hash of key has been saved to database and will be used to validate future entires of the key.");
+                                },
+                                error: function (xhr, httpStatusMessage, customErrorMessage) {
+                                    alert("Error processing security key: " + customErrorMessage);
+                                    gotoHomePage();
+                                }
+                            });
+                            
+                        } else {
+                            alert("Key values do not match.");
+                        }
                     }
                 },
                 {
-                    // Cancel entry of key and phrase
+                    // Cancel entry of key
                     label: 'Cancel',
                     action: function (dialogRef) {
                         dialogRef.close();
@@ -64,69 +61,27 @@ function promptForKey(promptForCheckPhrase) {
             closable: false,
             size: BootstrapDialog.SIZE_LARGE,
             title: 'ACA-IRS File Processer',
-            message: 'Please enter security key: <textarea class="form-control" rows="1" style="min-width: 100%" ></textarea>',
+            message: 'Please enter security key: <textarea class="form-control" id="key" rows="1" style="min-width: 100%" ></textarea>',
             buttons: [
                 {
                     label: 'OK',
                     action: function (dialogRef) {
-                        var key = dialogRef.getModalBody().find('textarea').val();
+                        var key = dialogRef.getModalBody().find('#key').val();
 
                         if (!validateKey(key)) {
                             return false;
                         }
 
                         $.ajax({
-                            url: "/Default/PostEncryptionKey",
+                            url: "/Default/PostSecurityKey",
                             type: "POST",
                             data: { 'key': key },
                             dataType: "json",
                             success: function (data) {
-                                if (data.status == "ValidateCheckPhrase") {
-                                    BootstrapDialog.show({
-                                        closable: false,
-                                        title: 'ACA-IRS File Processer',
-                                        message: 'Does this match the phrase originally entered?'
-                                            + '<fieldset class="form-group">'
-                                            + '   <label for="securityKey">Security Key Entered</label>'
-                                            + '   <textarea class="form-control" id="securityKey" rows="1" style="min-width: 100%" readonly>' + data.key + '</textarea>'
-                                            + '   <label for="phrase">Decrypted Phrase</label>'
-                                            + '   <textarea class="form-control" id="phrase" rows="3" style="min-width: 100%" readonly>' + data.phrase + '</textarea>'
-                                            + '</fieldset>',
-                                        buttons: [
-                                            {
-                                                label: 'Yes',
-                                                action: function (dialogRef) {
-                                                    dialogRef.close();
-                                                    $.ajax({
-                                                        url: "/Default/PostCheckPhraseResponse/",
-                                                        type: "POST",
-                                                        data: { 'key': data.key },
-                                                        dataType: "json",
-                                                        success: function (data) {
-
-                                                        }
-                                                    });
-                                                }
-                                            },
-                                            {
-                                                // User indicates phrase does not match
-                                                label: 'No',
-                                                action: function (dialogRef) {
-                                                    alert("Please review the security key entered and try again.");
-                                                    dialogRef.close();
-                                                    gotoHomePage();
-                                                }
-                                            }
-                                        ]
-                                    });
-                                }
-                                else {
-                                    alert("Invalid response from server - please contact ISD support.");
-                                    gotoHomePage();
-                                }
                             },
                             error: function (xhr, httpStatusMessage, customErrorMessage) {
-                                alert("Status = " + xhr.status + ", Message = " + customErrorMessage);
+                                alert("Error processing security key: " + customErrorMessage);
+                                gotoHomePage();
                             }
                         });
                         dialogRef.close();
@@ -159,16 +114,5 @@ function validateKey(value)
         alert('Key cannot contain any white space (spaces, tabs, line returns, etc.)');
         return false;
     }
-}
-
-function validatePhrase(value)
-{
-    if ($.trim(value.toLowerCase()) === '') {
-        alert('Please enter a phrase or press Cancel.');
-        return false;
-    }
-    else if (value.length < 100) {
-        alert('Phrase must be at least 100 characters in length.');
-        return false;
-    }
+    return true;
 }

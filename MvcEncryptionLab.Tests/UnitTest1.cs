@@ -263,24 +263,28 @@ namespace MvcEncryptionLab.Tests
             Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
         }
 
-        string checkPhrase = "Four score and seven years ago...";
-
         [TestMethod]
-        public void TestSetCheckPhrase()
+        public void TestSecurityKey()
         {
-            SecurityUtils.SetUserEncryptionKey(userName, encryptionKey, 5);
-            DAL dal = new DAL();
-            dal.SetCheckPhrase(userName, checkPhrase);
-            Assert.IsTrue(dal.IsCheckPhrase());
-        }
+            // Security key should not exist
 
-        [TestMethod]
-        public void TestGetCheckPhrase()
-        {
-            SecurityUtils.SetUserEncryptionKey(userName, encryptionKey, 5);
             DAL dal = new DAL();
-            string decryptedCheckPhrase = dal.GetCheckPhrase(userName);
-            Assert.AreEqual(checkPhrase, decryptedCheckPhrase);
+            dal.SetSecurityKey(encryptionKey);
+            Assert.IsTrue(dal.SecurityKeyExists());
+            Assert.IsTrue(dal.CheckSecurityKey(encryptionKey));
+
+            try
+            {
+                dal.SetSecurityKey(encryptionKey);
+                Assert.Fail("Should not be able to call SetSecurityKey() 2nd time!");
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            dal.ClearSecurityKey();
+            Assert.IsFalse(dal.SecurityKeyExists());
         }
     }
 }

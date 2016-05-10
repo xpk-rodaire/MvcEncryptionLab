@@ -6,14 +6,14 @@
 
 <h2>Encrypt Operation</h2>
 
-<input type="hidden" id="checkPhrase" data-value="@ViewBag.CheckPhrase" />
+<input type="hidden" id="keyExists" data-value="@ViewBag.KeyExists" />
 <input type="hidden" id="promptForKey" data-value="@ViewBag.PromptForKey" />
 
 @section scripts
 {
     <script>
         if ($("#promptForKey").data("value")) {
-            promptForKey($("#checkPhrase").data("value"));
+            promptForKey($("#keyExists").data("value"));
         }
     </script>
 }
