@@ -48,7 +48,7 @@ namespace MvcEncryptionLab.Controllers
                 {
                     if (dal.CheckSecurityKey(key))
                     {
-                        SecurityUtils.SetUserEncryptionKey(User, key, 5);
+                        SecurityUtils.SetUserEncryptionKey(User, key, 10);
                         return this.Json(new { status = "success" });
                     }
                     else

@@ -73,15 +73,15 @@ namespace MvcEncryptionLabData
             {
                 string iv = "";
 
-                person.LastNameEncrypted = SecurityUtils.Encrypt(person.LastName, ref iv, userName);
+                person.LastNameEncrypted = SecurityUtils.EncryptWithUserName(person.LastName, ref iv, userName);
                 person.LastNameIV = iv;
 
-                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(person.Address.AddressLine1, ref iv, userName);
+                person.Address.AddressLine1Encrypted = SecurityUtils.EncryptWithUserName(person.Address.AddressLine1, ref iv, userName);
                 person.Address.AddressLine1IV = iv;
 
                 person.SSNSalt = SecurityUtils.GetSalt();
                 person.SSNHash = SecurityUtils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = SecurityUtils.Encrypt(person.SSN, ref iv, userName);
+                person.SSNEncrypted = SecurityUtils.EncryptWithUserName(person.SSN, ref iv, userName);
                 person.SSNIV = iv;
                 db.Person.Add(person);
 

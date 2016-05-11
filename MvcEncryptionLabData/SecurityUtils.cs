@@ -154,10 +154,10 @@ namespace MvcEncryptionLabData
         {
             // TODO: get user name
             string userName = "";
-            return Encrypt(plainText, ref iv, userName);
+            return EncryptWithUserName(plainText, ref iv, userName);
         }
 
-        public static string Encrypt(string plainText, ref string iv, string userName)
+        public static string EncryptWithUserName(string plainText, ref string iv, string userName)
         {
             string key = GetUserEncryptionKey(userName);
             if (string.IsNullOrEmpty(key))
@@ -165,22 +165,22 @@ namespace MvcEncryptionLabData
                 throw new ApplicationException(String.Format("No key found for user '{0}'.", userName));
             }
 
-            return _Encrypt(key, plainText, ref iv);
+            return EncryptWithKey(plainText, ref iv, key);
         }
 
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/system.security.cryptography.aescryptoserviceprovider.aspx
         /// </summary>
-        /// <param name="privateKey"></param>
+        /// <param name="key"></param>
         /// <param name="plainText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        private static string _Encrypt(string privateKey, string plainText, ref string iv)
+        public static string EncryptWithKey(string plainText, ref string iv, string key)
         {
             // Check arguments.
             if (plainText == null || plainText.Length <= 0)
                 throw new ArgumentNullException("plainText");
-            if (privateKey == null || privateKey.Length <= 0)
+            if (key == null || key.Length <= 0)
                 throw new ArgumentNullException("Key");
 
             byte[] encrypted;
@@ -188,7 +188,7 @@ namespace MvcEncryptionLabData
             // with the specified key and IV.
             using (AesCryptoServiceProvider aesAlg = new AesCryptoServiceProvider())
             {
-                aesAlg.Key = Convert.FromBase64String(privateKey);
+                aesAlg.Key = Convert.FromBase64String(key);
                 iv = Convert.ToBase64String(aesAlg.IV);
 
                 // Create a decrytor to perform the stream transform.
@@ -233,24 +233,24 @@ namespace MvcEncryptionLabData
                 throw new ApplicationException(String.Format("No key found for user '{0}'.", userName));
             }
 
-            return DecryptWithKey(key, cipherText, iv);
+            return DecryptWithKey(cipherText, iv, key);
         }
 
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/system.security.cryptography.aescryptoserviceprovider.aspx
         /// </summary>
-        /// <param name="privateKey"></param>
+        /// <param name="key"></param>
         /// <param name="cipherText"></param>
         /// <param name="iv"></param>
         /// <returns></returns>
-        public static string DecryptWithKey(string privateKey, string cipherText, string iv)
+        public static string DecryptWithKey(string cipherText, string iv, string key)
         {
             byte[] cipherTextAsBytes = Convert.FromBase64String(cipherText);
 
             // Check arguments.
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
-            if (privateKey == null || privateKey.Length <= 0)
+            if (key == null || key.Length <= 0)
                 throw new ArgumentNullException("Key");
             if (iv == null || iv.Length <= 0)
                 throw new ArgumentNullException("IV");
@@ -263,7 +263,7 @@ namespace MvcEncryptionLabData
             // with the specified key and IV.
             using (AesCryptoServiceProvider aesAlg = new AesCryptoServiceProvider())
             {
-                aesAlg.Key = Convert.FromBase64String(privateKey);
+                aesAlg.Key = Convert.FromBase64String(key);
                 aesAlg.IV = Convert.FromBase64String(iv);
 
                 // Create a decrytor to perform the stream transform.

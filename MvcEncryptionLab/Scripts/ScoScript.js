@@ -1,5 +1,5 @@
 ﻿
-var testKey = "8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
+var testKey = ""; //"8YMiP/3jSj6Zfe79lM8x0GqKOmbo9gR5qurmh68FqmY=";
 
 function promptForKey(keyExists, controllerName) {
 
