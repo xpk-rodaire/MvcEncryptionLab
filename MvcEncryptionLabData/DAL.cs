@@ -154,9 +154,66 @@ namespace MvcEncryptionLabData
         private Random random = new Random();
 
         private const int FIRST_NAME_COUNT = 5494;
+        private const int FIRST_NAME_MAX_CUM_FREQ_MALE = 90040;
+        private const int FIRST_NAME_MAX_CUM_FREQ_FEMALE = 90024;
+
         private const int LAST_NAME_COUNT = 88799;
+        private const int LAST_NAME_MAX_CUM_FREQ = 77480; //90483;
+
         private const int ZIP_CODE_COUNT = 2664;
         private const int ZIP_CODE_TOTAL_POP = 37187934;
+
+        public string GetRandomLastName()
+        {
+            using (DbEntities context = new DbEntities())
+            {
+                int freq = random.Next(1, LAST_NAME_MAX_CUM_FREQ);
+                double freqAsFloat = (double)freq / 1000;
+
+                LastName lastName = (
+                    from l in context.LastName
+                    where l.CumulativeFrequency >= freqAsFloat
+                    &&  (l.CumulativeFrequency - l.Frequency) <= freqAsFloat
+                    //&& l.Frequency > 0
+                    //orderby l.Rank
+                    select l
+                ).FirstOrDefault();
+
+                if (lastName == null)
+                {
+                    throw new Exception("GetRandomLastName(): Bad freq = " + freqAsFloat);
+                }
+
+                return lastName.Value;
+            }
+        }
+
+        public string GetRandomFirstName()
+        {
+            using (DbEntities context = new DbEntities())
+            {
+                bool isMale = (random.Next(0, 1) == 1);
+
+                int freq = random.Next(1, isMale ? FIRST_NAME_MAX_CUM_FREQ_MALE : FIRST_NAME_MAX_CUM_FREQ_FEMALE);
+                float freqAsFloat = (float)freq / 1000;
+
+                FirstName firstName = (
+                    from f in context.FirstName
+                    where freqAsFloat <= f.CumulativeFrequency
+                    && freqAsFloat > f.CumulativeFrequency - f.Frequency
+                    && f.IsMale == isMale
+                    && f.Frequency > 0
+                    select f
+                ).FirstOrDefault();
+
+                if (firstName == null)
+                {
+                    throw new Exception("GetRandomFirstName(): Bad freq = " + freqAsFloat);
+                }
+
+                return firstName.Value;
+            }
+        }
 
         public Person GetRandomPerson()
         {

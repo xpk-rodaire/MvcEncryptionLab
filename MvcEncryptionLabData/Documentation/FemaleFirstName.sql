@@ -1,3 +1,5 @@
+USE [Encryption]
+
 INSERT INTO FirstNames(Value, Frequency, CumulativeFrequency, Rank, IsMale) VALUES ('MARY',2.629, 2.629,1,0)
 INSERT INTO FirstNames(Value, Frequency, CumulativeFrequency, Rank, IsMale) VALUES ('PATRICIA',1.073, 3.702,2,0)
 INSERT INTO FirstNames(Value, Frequency, CumulativeFrequency, Rank, IsMale) VALUES ('LINDA',1.035, 4.736,3,0)

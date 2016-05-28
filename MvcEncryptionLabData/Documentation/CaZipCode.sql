@@ -1,3 +1,5 @@
+USE [Encryption]
+
 INSERT INTO CaZipCodes(ZipCode, City, Population, RangeLow, RangeHigh) VALUES('90001','LOS ANGELES', 57110, 1, 57110)
 INSERT INTO CaZipCodes(ZipCode, City, Population, RangeLow, RangeHigh) VALUES('90002','LOS ANGELES', 51223, 57111, 108333)
 INSERT INTO CaZipCodes(ZipCode, City, Population, RangeLow, RangeHigh) VALUES('90003','LOS ANGELES', 66266, 108334, 174599)

@@ -282,5 +282,18 @@ namespace MvcEncryptionLab.Tests
             string decryptedCheckPhrase = dal.GetCheckPhrase(userName);
             Assert.AreEqual(checkPhrase, decryptedCheckPhrase);
         }
+
+        [TestMethod]
+        public void TestRandomName()
+        {
+            DAL dal = new DAL();
+
+            int count = 10000;
+            for (int i = 0; i < count; ++i)
+            {
+                //Debug.WriteLine(dal.GetRandomFirstName() + " " + dal.GetRandomLastName());
+                Debug.WriteLine(dal.GetRandomLastName());
+            }
+        }
     }
 }
