@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using MvcEncryptionLabData;
 
 namespace MvcEncryptionLab.Controllers
 {
-    public class DefaultController : ApplicationController
+    public class Default2Controller : ApplicationController
     {
-        // GET: Default
+        // GET: Default2
         public ActionResult Index()
         {
             return View();

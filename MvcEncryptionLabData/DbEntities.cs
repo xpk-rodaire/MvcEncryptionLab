@@ -15,7 +15,7 @@ namespace MvcEncryptionLabData
             //this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
 
-        public virtual DbSet<EncryptedCheckPhrase> CheckPhrase { get; set; }
+        public virtual DbSet<SecurityKey> SecurityKey { get; set; }
 
         public virtual DbSet<Person> Person { get; set; }
         public virtual DbSet<Address> Address { get; set; }

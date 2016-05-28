@@ -22,8 +22,8 @@ namespace MvcEncryptionLab.Tests
 
             string plainText = "Steve was here but now he is gone";
             string iv = "";
-            string cipherText = SecurityUtils.Encrypt(plainText, ref iv, "");
-            string decryptedText = SecurityUtils.Decrypt(cipherText, iv, "");
+            string cipherText = SecurityUtils.EncryptWithKey(plainText, ref iv, encryptionKey);
+            string decryptedText = SecurityUtils.DecryptWithKey(cipherText, iv, encryptionKey);
 
             Assert.AreEqual(plainText, decryptedText);
         }
@@ -134,10 +134,10 @@ namespace MvcEncryptionLab.Tests
 
                 string iv = "";
                 // Encrypt the string to an array of bytes.
-                string encrypted = SecurityUtils.Encrypt(original, ref iv, "");
+                string encrypted = SecurityUtils.EncryptWithUserName(original, ref iv, "");
 
                 // Decrypt the bytes to a string.
-                string roundtrip = SecurityUtils.Decrypt(encrypted, iv, "");
+                string roundtrip = SecurityUtils.DecryptWithUserName(encrypted, iv, "");
 
                 Assert.AreEqual(original, roundtrip);
             }
@@ -263,24 +263,28 @@ namespace MvcEncryptionLab.Tests
             Assert.IsFalse(SecurityUtils.UserHasEncryptionKey(userName));
         }
 
-        string checkPhrase = "Four score and seven years ago...";
-
         [TestMethod]
-        public void TestSetCheckPhrase()
+        public void TestSecurityKey()
         {
-            SecurityUtils.SetUserEncryptionKey(userName, encryptionKey, 5);
-            DAL dal = new DAL();
-            dal.SetCheckPhrase(userName, checkPhrase);
-            Assert.IsTrue(dal.IsCheckPhrase());
-        }
+            // Security key should not exist
 
-        [TestMethod]
-        public void TestGetCheckPhrase()
-        {
-            SecurityUtils.SetUserEncryptionKey(userName, encryptionKey, 5);
             DAL dal = new DAL();
-            string decryptedCheckPhrase = dal.GetCheckPhrase(userName);
-            Assert.AreEqual(checkPhrase, decryptedCheckPhrase);
+            dal.SetSecurityKey(encryptionKey);
+            Assert.IsTrue(dal.SecurityKeyExists());
+            Assert.IsTrue(dal.CheckSecurityKey(encryptionKey));
+
+            try
+            {
+                dal.SetSecurityKey(encryptionKey);
+                Assert.Fail("Should not be able to call SetSecurityKey() 2nd time!");
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            dal.ClearSecurityKey();
+            Assert.IsFalse(dal.SecurityKeyExists());
         }
 
         [TestMethod]

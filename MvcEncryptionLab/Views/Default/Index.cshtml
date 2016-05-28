@@ -3,8 +3,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>View</h2>
+<h2>Simulated Home Page</h2>
 
-<h4>This is the home page!</h4>
-
-@Html.ActionLink("Encrypt/Decrypt Operation", "EncryptOperation")
+<div>@Html.ActionLink("1) Page With Encrypt/Decrypt Operation", "EncryptOperation", "Default")</div>
+<div>@Html.ActionLink("1) Page Without Encrypt/Decrypt Operation", "NoEncryptOperation", "Default")</div>
+<br />
+<div>@Html.ActionLink("2) Page With Encrypt/Decrypt Operation", "EncryptOperation", "Default2")</div>
+<div>@Html.ActionLink("2) Page Without Encrypt/Decrypt Operation", "NoEncryptOperation", "Default2")</div>

@@ -1,0 +1,16 @@
+﻿
+    //       > Choose phrase to store as check in database
+    //       > When key used for first time, encrypt phrase with key, store IV and encrypted value in database
+    //       > On all subsequent key entries, decrypt phrase and display to user
+    //            When entering security key, 
+    //       > Prompt user if decrypted phrase is accurate, proceed with encrypt/decrypt
+
+    // If no check phrase in system, prompt for both key and phrase
+    // Prompt for key 2nd time
+    // Is phrase correct?
+    //     N -
+
+
+> User is prompted for security key
+>    If no security key record in DB, ask for user to enter twice
+> 

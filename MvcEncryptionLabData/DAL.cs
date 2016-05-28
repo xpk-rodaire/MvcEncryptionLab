@@ -9,59 +9,58 @@ namespace MvcEncryptionLabData
 {
     public class DAL
     {
-        public bool IsCheckPhrase()
+        public bool SecurityKeyExists()
         {
             using (DbEntities db = new DbEntities())
             {
                 return (
-                    from c in db.CheckPhrase
-                    select c
+                    from s in db.SecurityKey
+                    select s
                 ).Any();
             }
         }
 
-        public string GetCheckPhrase(string userName)
+        public bool CheckSecurityKey(string key)
         {
+            if (!SecurityKeyExists())
+            {
+                throw new ApplicationException("CheckSecurityKey() - no security key defined.");
+            }
+
             using (DbEntities db = new DbEntities())
             {
-                EncryptedCheckPhrase cp =
-                (
-                    from c in db.CheckPhrase
-                    select c
-                ).FirstOrDefault();
+                SecurityKey sk = (from s in db.SecurityKey select s).FirstOrDefault();
 
-                if (cp == null)
-                {
-                    return null;
-                    //throw new ApplicationException("GetCheckPhrase() - no check phrase defined.");
-                }
+                string hash = SecurityUtils.Hash(key, sk.SecurityKeySalt);
 
-                string valueDecrypted = cp.CheckPhrase = SecurityUtils.Decrypt(
-                    cp.CheckPhraseEncrypted,
-                    cp.CheckPhraseIV,
-                    userName
-                );
-
-                return valueDecrypted;
+                return hash.Equals(sk.SecurityKeyHash);
             }
         }
 
-        public void SetCheckPhrase(string userName, string value)
+        public void SetSecurityKey(string value)
         {
-            string iv = "";
-            string encryptedValue = SecurityUtils.Encrypt(
-                value,
-                ref iv,
-                userName
-            );
+            if (SecurityKeyExists())
+            {
+                throw new ApplicationException("SetSecurityKey() - security key already exists.");
+            }
 
             using (DbEntities db = new DbEntities())
             {
-                EncryptedCheckPhrase cp = new EncryptedCheckPhrase();
-                cp.CheckPhraseEncrypted = encryptedValue;
-                cp.CheckPhraseIV = iv;
+                SecurityKey sk = new SecurityKey();
+                sk.SecurityKeySalt = SecurityUtils.GetSalt();
+                sk.SecurityKeyHash = SecurityUtils.Hash(value, sk.SecurityKeySalt);
 
-                db.CheckPhrase.Add(cp);
+                db.SecurityKey.Add(sk);
+                db.SaveChanges();
+            }
+        }
+
+        public void ClearSecurityKey()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                SecurityKey sk = (from s in db.SecurityKey select s).FirstOrDefault();
+                db.SecurityKey.Remove(sk);
                 db.SaveChanges();
             }
         }
@@ -74,15 +73,15 @@ namespace MvcEncryptionLabData
             {
                 string iv = "";
 
-                person.LastNameEncrypted = SecurityUtils.Encrypt(person.LastName, ref iv, userName);
+                person.LastNameEncrypted = SecurityUtils.EncryptWithUserName(person.LastName, ref iv, userName);
                 person.LastNameIV = iv;
 
-                person.Address.AddressLine1Encrypted = SecurityUtils.Encrypt(person.Address.AddressLine1, ref iv, userName);
+                person.Address.AddressLine1Encrypted = SecurityUtils.EncryptWithUserName(person.Address.AddressLine1, ref iv, userName);
                 person.Address.AddressLine1IV = iv;
 
                 person.SSNSalt = SecurityUtils.GetSalt();
                 person.SSNHash = SecurityUtils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = SecurityUtils.Encrypt(person.SSN, ref iv, userName);
+                person.SSNEncrypted = SecurityUtils.EncryptWithUserName(person.SSN, ref iv, userName);
                 person.SSNIV = iv;
                 db.Person.Add(person);
 
@@ -107,8 +106,8 @@ namespace MvcEncryptionLabData
                     select p
                 ).FirstOrDefault();
 
-                person.LastName = SecurityUtils.Decrypt(person.LastNameEncrypted, person.LastNameIV, userName);
-                person.SSN = SecurityUtils.Decrypt(person.SSNEncrypted, person.SSNIV, userName);
+                person.LastName = SecurityUtils.DecryptWithUserName(person.LastNameEncrypted, person.LastNameIV, userName);
+                person.SSN = SecurityUtils.DecryptWithUserName(person.SSNEncrypted, person.SSNIV, userName);
 
                 return person;
             }
@@ -140,8 +139,8 @@ namespace MvcEncryptionLabData
 
                         if (person.SSNHash.Equals(ssnToMatchHash))
                         {
-                            person.LastName = SecurityUtils.Decrypt(person.LastNameEncrypted, person.LastNameIV, userName);
-                            person.SSN = SecurityUtils.Decrypt(person.SSNEncrypted, person.SSNIV, userName);
+                            person.LastName = SecurityUtils.DecryptWithUserName(person.LastNameEncrypted, person.LastNameIV, userName);
+                            person.SSN = SecurityUtils.DecryptWithUserName(person.SSNEncrypted, person.SSNIV, userName);
                             return person;
                         }
                     }
