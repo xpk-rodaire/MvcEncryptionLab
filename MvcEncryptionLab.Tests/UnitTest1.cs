@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Security;
 using System.Xml;
 using System.Xml.XPath;
+using System.IO;
 
 namespace MvcEncryptionLab.Tests
 {
@@ -290,13 +291,17 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestRandomName()
         {
+            string filePath = @"C:\Data\Git\MvcEncryptionLab\MvcEncryptionLabData\Documentation\RandomNames.csv";
+
             DAL dal = new DAL();
 
-            int count = 10000;
-            for (int i = 0; i < count; ++i)
+            using (StreamWriter writetext = new StreamWriter(filePath))
             {
-                //Debug.WriteLine(dal.GetRandomFirstName() + " " + dal.GetRandomLastName());
-                Debug.WriteLine(dal.GetRandomLastName());
+                int count = 300000;
+                for (int i = 0; i < count; ++i)
+                {
+                    writetext.WriteLine(dal.GetRandomFirstName().Value + "," + dal.GetRandomLastName().Value + "," + RandomUtils.RandomSSN());
+                }
             }
         }
     }

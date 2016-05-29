@@ -73,16 +73,16 @@ namespace MvcEncryptionLabData
             {
                 string iv = "";
 
-                person.LastNameEncrypted = SecurityUtils.EncryptWithUserName(person.LastName, ref iv, userName);
-                person.LastNameIV = iv;
+                person.LastNameEncrypted = person.LastName; //.LastNameSecurityUtils.EncryptWithUserName(person.LastName, ref iv, userName);
+                person.LastNameIV = person.LastName; //iv;
 
-                person.Address.AddressLine1Encrypted = SecurityUtils.EncryptWithUserName(person.Address.AddressLine1, ref iv, userName);
-                person.Address.AddressLine1IV = iv;
+                person.Address.AddressLine1Encrypted = person.Address.AddressLine1; // SecurityUtils.EncryptWithUserName(person.Address.AddressLine1, ref iv, userName);
+                person.Address.AddressLine1IV = person.Address.AddressLine1; //iv;
 
                 person.SSNSalt = SecurityUtils.GetSalt();
                 person.SSNHash = SecurityUtils.Hash(person.SSN, person.SSNSalt);
-                person.SSNEncrypted = SecurityUtils.EncryptWithUserName(person.SSN, ref iv, userName);
-                person.SSNIV = iv;
+                person.SSNEncrypted = person.SSN; // SecurityUtils.EncryptWithUserName(person.SSN, ref iv, userName);
+                person.SSNIV = person.SSN; //iv;
                 db.Person.Add(person);
 
                 var errors = db.GetValidationErrors();
@@ -157,60 +157,67 @@ namespace MvcEncryptionLabData
         private const int FIRST_NAME_MAX_CUM_FREQ_FEMALE = 90024;
 
         private const int LAST_NAME_COUNT = 88799;
-        private const int LAST_NAME_MAX_CUM_FREQ = 77480; //90483;
+        private const int LAST_NAME_MAX_CUM_FREQ = 90483;
 
         private const int ZIP_CODE_COUNT = 2664;
         private const int ZIP_CODE_TOTAL_POP = 37187934;
 
-        public string GetRandomLastName()
+        public LastName GetRandomLastName()
         {
             using (DbEntities context = new DbEntities())
             {
                 int freq = random.Next(1, LAST_NAME_MAX_CUM_FREQ);
                 double freqAsFloat = (double)freq / 1000;
 
-                LastName lastName = (
+                LastName lastName;
+
+                lastName = (
                     from l in context.LastName
                     where l.CumulativeFrequency >= freqAsFloat
-                    &&  (l.CumulativeFrequency - l.Frequency) <= freqAsFloat
-                    //&& l.Frequency > 0
-                    //orderby l.Rank
                     select l
                 ).FirstOrDefault();
 
                 if (lastName == null)
                 {
-                    throw new Exception("GetRandomLastName(): Bad freq = " + freqAsFloat);
+                    lastName = (
+                        from l in context.LastName
+                        where l.Rank == 1
+                        select l
+                    ).FirstOrDefault();
                 }
 
-                return lastName.Value;
+                return lastName;
             }
         }
 
-        public string GetRandomFirstName()
+        public FirstName GetRandomFirstName()
         {
             using (DbEntities context = new DbEntities())
             {
-                bool isMale = (random.Next(0, 1) == 1);
+                bool isMale = (random.Next(0, 2) == 1);
 
                 int freq = random.Next(1, isMale ? FIRST_NAME_MAX_CUM_FREQ_MALE : FIRST_NAME_MAX_CUM_FREQ_FEMALE);
                 float freqAsFloat = (float)freq / 1000;
 
-                FirstName firstName = (
+                FirstName firstName;
+
+                firstName = (
                     from f in context.FirstName
-                    where freqAsFloat <= f.CumulativeFrequency
-                    && freqAsFloat > f.CumulativeFrequency - f.Frequency
+                    where f.CumulativeFrequency >= freqAsFloat
                     && f.IsMale == isMale
-                    && f.Frequency > 0
                     select f
                 ).FirstOrDefault();
 
                 if (firstName == null)
                 {
-                    throw new Exception("GetRandomFirstName(): Bad freq = " + freqAsFloat);
+                    firstName = (
+                        from f in context.FirstName
+                        where f.Rank == 1
+                        select f
+                    ).FirstOrDefault();
                 }
 
-                return firstName.Value;
+                return firstName;
             }
         }
 

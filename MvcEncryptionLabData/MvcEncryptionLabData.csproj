@@ -80,6 +80,7 @@
     <Content Include="Documentation\ImportSampleData.sql" />
     <Content Include="Documentation\LastName.sql" />
     <Content Include="Documentation\MaleFirstName.sql" />
+    <Content Include="Documentation\RandomNames.txt" />
     <Content Include="Documentation\Security Key.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
