@@ -268,5 +268,35 @@ namespace MvcEncryptionLabData
             }
             return person;
         }
+
+        public void AddLogItem()
+        {
+
+        }
+
+        public void LongProcess(string processId)
+        {
+            Process process = new Process
+            {
+                Name = "LongProcess",
+                Description = "A long test process"
+            };
+
+            process.Phases.Add(
+                new ProcessPhase
+                {
+                    Name = "Phase 1",
+                    Description = "Description 1"
+                }
+            );
+
+            process.Phases.Add(
+                new ProcessPhase
+                {
+                    Name = "Phase 2",
+                    Description = "Description 2"
+                }
+            );
+        }
     }
 }
