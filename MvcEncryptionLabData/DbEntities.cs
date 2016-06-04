@@ -23,5 +23,9 @@ namespace MvcEncryptionLabData
         public virtual DbSet<CaZipCode> CaZipCode { get; set; }
         public virtual DbSet<LastName> LastName { get; set; }
         public virtual DbSet<FirstName> FirstName { get; set; }
+
+        public virtual DbSet<LogItem> LogItem { get; set; }
+        //public virtual DbSet<Process> Process { get; set; }
+        //public virtual DbSet<ProcessPhase> ProcessPhase { get; set; }
     }
 }
