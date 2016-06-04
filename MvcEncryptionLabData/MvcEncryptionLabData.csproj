@@ -57,7 +57,7 @@
     <Compile Include="CheckPhrase.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogItem.cs" />
-    <Compile Include="Process2.cs" />
+    <Compile Include="Process.cs" />
     <Compile Include="Random.cs" />
     <Compile Include="DAL.cs" />
     <Compile Include="DbEntities.cs" />
