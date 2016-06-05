@@ -15,7 +15,7 @@ namespace MvcEncryptionLabData
 
         public LogItem(string user, string target, DateTime dateTime, string text)
         {
-            this.User = user;
+            this.UserName = user;
             this.Target = target;
             this.CreateDateTime = dateTime;
             this.Text = text;
@@ -24,7 +24,7 @@ namespace MvcEncryptionLabData
         public int LogItemId { get; set; }
 
         [MaxLength(25)]
-        public string User { get; set; }
+        public string UserName { get; set; }
 
         [MaxLength(255)]
         public string Target { get; set; }
