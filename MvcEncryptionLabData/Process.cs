@@ -7,15 +7,21 @@ using System.Diagnostics;
 
 namespace MvcEncryptionLabData
 {
+    public class ProcessStatus
+    {
+        public Guid ProcessId { get; set; }
+        public string UserName { get; set; }
+        public int PercentComplete { get; set; }
+        public string Status { get; set; }
+    }
+
     public abstract class AbstractProcess
     {
         private Stopwatch _stopwatch = new Stopwatch();
         private int _percentComplete = 0;
-        private Logger _logger;
 
-        public AbstractProcess(Logger logger)
+        public AbstractProcess()
         {
-            this._logger = logger;
             this.ProcessId = Guid.NewGuid();
         }
 
@@ -53,14 +59,6 @@ namespace MvcEncryptionLabData
 
         protected abstract string LogDescription { get; }
 
-        public Logger Logger
-        {
-            get
-            {
-                return this._logger;
-            }
-        }
-
         public bool NotStarted
         {
             get
@@ -83,55 +81,55 @@ namespace MvcEncryptionLabData
             }
         }
 
-        public void Start()
+        public LogItem Start()
         {
-            this.LogItem(
-                target: "",
-                text: String.Format(
+            this.StartTime = DateTime.Now;
+            this._stopwatch.Start();
+            return LogItem(
+                String.Format(
                     "Starting {0}",
                     this.LogDescription,
                     this.Description
                 )
             );
-            this.StartTime = DateTime.Now;
-            this._stopwatch.Start();
         }
 
-        public void Finish()
+        public LogItem Finish()
         {
             this._stopwatch.Stop();
             this.Duration = this._stopwatch.Elapsed;
-            this.LogItem(
-                target: "",
-                text: String.Format(
+            this._stopwatch.Reset();
+            return LogItem(
+                String.Format(
                     "Finished {0} in {1} seconds",
                     this.LogDescription,
                     this.Duration.Value.TotalSeconds.ToString("#,##0")
                 )
             );
-            this._stopwatch.Reset();
         }
 
-        protected void LogItem(string target, string text)
+        public LogItem LogItem(string text)
         {
-            this.Logger.AddLogItem(
-                new Logger.LogItem
-                {
-                    Target = target,
-                    CreateDateTime = DateTime.Now,
-                    Text = text,
-                    Type = Logger.LogItemType.Info,
-                    ProcessId = this.ProcessId,
-                    ProcessPercentComplete = this.PercentComplete
-                }
-            );
+            return new LogItem
+            {
+                Target = "",
+                CreateDateTime = DateTime.Now,
+                Text = String.Format(
+                    "{0} - {1}",
+                    this.LogDescription,
+                    text
+                ),
+                Type = Logger.LogItemType.Info,
+                ProcessId = this.ProcessId,
+                ProcessPercentComplete = this.PercentComplete
+            };
         }
     }
 
     public class Process : AbstractProcess
     {
-        public Process(Logger logger)
-            : base(logger)
+        public Process()
+            : base()
         {
             this.Phases = new List<ProcessPhase>();
         }
@@ -148,6 +146,18 @@ namespace MvcEncryptionLabData
             }
         }
 
+        public ProcessPhase AddProcessPhase(string name, string description, int number)
+        {
+            ProcessPhase newPhase = new ProcessPhase(this, this.ProcessId)
+            {
+                Name = name,
+                Description = description,
+                PhaseNumber = number
+            };
+            this.Phases.Add(newPhase);
+            return newPhase;
+        }
+
         public List<ProcessPhase> Phases { get; set; }
     }
 
@@ -155,10 +165,11 @@ namespace MvcEncryptionLabData
     {
         private Process _parent;
 
-        public ProcessPhase(Logger logger, Process parent)
-            : base(logger)
+        public ProcessPhase(Process parent, Guid processId)
+            : base()
         {
             this._parent = parent;
+            this.ProcessId = processId;
         }
 
         protected override string LogDescription

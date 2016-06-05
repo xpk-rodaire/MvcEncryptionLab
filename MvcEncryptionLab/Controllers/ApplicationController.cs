@@ -64,5 +64,17 @@ namespace MvcEncryptionLab.Controllers
                 }
             }
         }
+
+        [HttpPost]
+        public ActionResult RunLongProcess()
+        {
+            DAL dal = new DAL();
+
+            //dal.RunReallyLongProcess();
+
+            return null;
+
+        }
+
     }
 }

@@ -310,11 +310,13 @@ namespace MvcEncryptionLab.Tests
         {
             DAL dal = new DAL();
 
+            //Guid pid = dal.GetMostRecentProcess();
+
             Logger logger = new Logger();
 
             dal.RunReallyLongProcess(logger);
 
-            string s = "steve";
+            dal.AddLogger("TestUser", logger);
         }
     }
 }
