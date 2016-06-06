@@ -57,6 +57,15 @@
     <Compile Include="CheckPhrase.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogItem.cs" />
+    <Compile Include="Migrations\201606060315189_InitialCreate.cs" />
+    <Compile Include="Migrations\201606060315189_InitialCreate.Designer.cs">
+      <DependentUpon>201606060315189_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606060340016_AddBlogUrl.cs" />
+    <Compile Include="Migrations\201606060340016_AddBlogUrl.Designer.cs">
+      <DependentUpon>201606060340016_AddBlogUrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Process.cs" />
     <Compile Include="Random.cs" />
     <Compile Include="DAL.cs" />
@@ -85,6 +94,14 @@
     <Content Include="Documentation\MaleFirstName.sql" />
     <Content Include="Documentation\RandomNames.txt" />
     <Content Include="Documentation\Security Key.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201606060315189_InitialCreate.resx">
+      <DependentUpon>201606060315189_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606060340016_AddBlogUrl.resx">
+      <DependentUpon>201606060340016_AddBlogUrl.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
