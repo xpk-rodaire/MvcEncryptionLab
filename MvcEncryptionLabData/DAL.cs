@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using System.Threading;
 
 namespace MvcEncryptionLabData
 {
@@ -150,6 +151,8 @@ namespace MvcEncryptionLabData
             }
         }
 
+        #region Random Stuff
+
         private Random random = new Random();
 
         private const int FIRST_NAME_COUNT = 5494;
@@ -229,7 +232,7 @@ namespace MvcEncryptionLabData
 
             using (DbEntities context = new DbEntities())
             {
-                FirstName firstName  = (
+                FirstName firstName = (
                     from f in context.FirstName
                     where f.FirstNameId == firstNameId
                     select f
@@ -239,7 +242,7 @@ namespace MvcEncryptionLabData
 
                 int lastNameId = random.Next(1, LAST_NAME_COUNT);
 
-                LastName lastName  = (
+                LastName lastName = (
                     from l in context.LastName
                     where l.LastNameId == lastNameId
                     select l
@@ -256,7 +259,7 @@ namespace MvcEncryptionLabData
 
                 int zipCodeId = random.Next(1, ZIP_CODE_COUNT);
 
-                CaZipCode zipCode  = (
+                CaZipCode zipCode = (
                     from z in context.CaZipCode
                     where z.CaZipCodeId == zipCodeId
                     select z
@@ -269,34 +272,196 @@ namespace MvcEncryptionLabData
             return person;
         }
 
-        public void AddLogItem()
-        {
+       #endregion
 
+        #region Log Item
+
+        public void AddLogItem(
+            string userName,
+            Logger.LogItemType type,
+            string target,
+            string text)
+        {
+            using (var context = new DbEntities())
+            {
+                LogItem item = new LogItem
+                {
+                    UserName = userName,
+                    Type = type,
+                    Target = target,
+                    Text = text,
+                    CreateDateTime = DateTime.Now
+                };
+                context.LogItem.Add(item);
+
+                var validationErrors = context.GetValidationErrors();
+
+                context.SaveChanges();
+            }
         }
 
-        public void LongProcess(string processId)
+        public void AddLogItem(
+            string userName,
+            Logger.LogItemType type,
+            string target,
+            string text,
+            Guid processId,
+            int processPercentComplete
+        )
         {
-            Process process = new Process
+            using (var context = new DbEntities())
             {
-                Name = "LongProcess",
-                Description = "A long test process"
+                LogItem item = new LogItem
+                {
+                    UserName = userName,
+                    Type = type,
+                    Target = target,
+                    Text = text,
+                    CreateDateTime = DateTime.Now,
+                    ProcessId = processId,
+                    ProcessPercentComplete = processPercentComplete
+                };
+                context.LogItem.Add(item);
+
+                var validationErrors = context.GetValidationErrors();
+
+                context.SaveChanges();
+            }
+        }
+
+        public void AddLogItem(LogItem item)
+        {
+            using (var context = new DbEntities())
+            {
+                context.LogItem.Add(item);
+                var validationErrors = context.GetValidationErrors();
+                context.SaveChanges();
+            }
+        }
+
+        private void _AddLogger(string userName, Logger logger, DbEntities context)
+        {
+            foreach (Logger.LogItem item in logger.LogItems)
+            {
+                LogItem dbItem = new LogItem()
+                {
+                    UserName = userName,
+                    Target = item.Target,
+                    CreateDateTime = item.CreateDateTime,
+                    Text = item.Text,
+                    Type = item.Type,
+                    ProcessId = item.ProcessId,
+                    ProcessPercentComplete = item.ProcessPercentComplete
+                };
+                context.LogItem.Add(dbItem);
+            }
+        }
+
+        public void AddLogger(string user, Logger logger)
+        {
+            using (var context = new DbEntities())
+            {
+                this._AddLogger(user, logger, context);
+                var validationErrors = context.GetValidationErrors();
+                context.SaveChanges();
+            }
+        }
+
+        #endregion
+
+        #region Process
+
+        public Guid GetMostRecentProcess()
+        {
+            using (DbEntities context = new DbEntities())
+            {
+                Guid processId = (
+                    from l in context.LogItem
+                    where l.ProcessId != null
+                    orderby l.CreateDateTime descending
+                    select l.ProcessId
+                )
+                .FirstOrDefault();
+
+                return processId;
+            }
+        }
+
+        public ProcessStatus GetProcessStatus(Guid processId)
+        {
+            using (DbEntities context = new DbEntities())
+            {
+                ProcessStatus status = (
+                    from l in context.LogItem
+                    where l.ProcessId == processId
+                    orderby l.CreateDateTime descending
+                    select new ProcessStatus
+                    {
+                        ProcessId = l.ProcessId,
+                        UserName = l.UserName,
+                        PercentComplete = l.ProcessPercentComplete,
+                        Status = l.Text
+                    }
+                )
+                .FirstOrDefault();
+
+                return status;
+            }
+        }
+
+        #endregion
+
+        public void RunReallyLongProcess(Logger logger)
+        {
+            Process process = new Process()
+            {
+                Name = "Test Process",
+                Description = "Test Process Description",
+                UserName = ""
             };
 
-            process.Phases.Add(
-                new ProcessPhase
-                {
-                    Name = "Phase 1",
-                    Description = "Description 1"
-                }
+            process.AddProcessPhase(
+                name: "Test Phase 1",
+                description: "Test Phase 1 Description",
+                number: 1
             );
 
-            process.Phases.Add(
-                new ProcessPhase
-                {
-                    Name = "Phase 2",
-                    Description = "Description 2"
-                }
+            process.AddProcessPhase(
+                name: "Test Phase 2",
+                description: "Test Phase 2 Description",
+                number: 2
             );
+
+            this.AddLogItem(process.Start());
+
+            Thread.Sleep(2000);
+
+            ProcessPhase phase1 = process.Phases[0];
+            this.AddLogItem(phase1.Start());
+
+            foreach (int index in Enumerable.Range(1, 10))
+            {
+                phase1.PercentComplete = index * 10;
+                this.AddLogItem(phase1.LogItem("Processed next 1000 records"));
+                Thread.Sleep(1000);
+            }
+
+            this.AddLogItem(phase1.Finish());
+
+            Thread.Sleep(2000);
+
+            ProcessPhase phase2 = process.Phases[1];
+
+            this.AddLogItem(phase2.Start());
+
+            Thread.Sleep(2000);
+
+            this.AddLogItem(process.Phases[1].Finish());
+
+            Thread.Sleep(2000);
+
+            this.AddLogItem(process.Finish());
         }
     }
 }
+

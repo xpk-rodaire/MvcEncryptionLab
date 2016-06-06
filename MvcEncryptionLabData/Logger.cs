@@ -85,7 +85,7 @@ namespace MvcEncryptionLabData
         {
             if (lineNumber > -1)
             {
-                this._AddLogItem(
+                this.AddLogItem(
                     item: new LogItem
                     {
                         Type = type,
@@ -100,7 +100,7 @@ namespace MvcEncryptionLabData
             }
             else
             {
-                this._AddLogItem(
+                this.AddLogItem(
                     item: new LogItem
                     {
                         Type = type,
@@ -117,7 +117,7 @@ namespace MvcEncryptionLabData
             string target
         )
         {
-            this._AddLogItem(
+            this.AddLogItem(
                 item: new LogItem
                 {
                     Type = type,
@@ -128,7 +128,7 @@ namespace MvcEncryptionLabData
             );
         }
 
-        private void _AddLogItem(LogItem item)
+        public void AddLogItem(LogItem item)
         {
             this._logItemCounts[item.Type] = this._logItemCounts[item.Type] + 1;
             this._log.Add(item);

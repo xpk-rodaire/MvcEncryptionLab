@@ -304,5 +304,19 @@ namespace MvcEncryptionLab.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void TestReallyLongProcess()
+        {
+            DAL dal = new DAL();
+
+            //Guid pid = dal.GetMostRecentProcess();
+
+            Logger logger = new Logger();
+
+            dal.RunReallyLongProcess(logger);
+
+            dal.AddLogger("TestUser", logger);
+        }
     }
 }
