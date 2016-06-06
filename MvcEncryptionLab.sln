@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FipsCheckerUtility", "FipsC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcaIrsXmlFileProcesser", "AcaIrsXmlFileProcesser\AcaIrsXmlFileProcesser.csproj", "{23D33972-0EA9-4280-BDA4-784198287BDF}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MvcEncryptionLabDb", "MvcEncryptionLabDb\MvcEncryptionLabDb.sqlproj", "{08A64EC8-D3FF-4632-9613-3A89B7B0325D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,12 @@ Global
 		{23D33972-0EA9-4280-BDA4-784198287BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23D33972-0EA9-4280-BDA4-784198287BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23D33972-0EA9-4280-BDA4-784198287BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A64EC8-D3FF-4632-9613-3A89B7B0325D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A64EC8-D3FF-4632-9613-3A89B7B0325D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A64EC8-D3FF-4632-9613-3A89B7B0325D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{08A64EC8-D3FF-4632-9613-3A89B7B0325D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A64EC8-D3FF-4632-9613-3A89B7B0325D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A64EC8-D3FF-4632-9613-3A89B7B0325D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
