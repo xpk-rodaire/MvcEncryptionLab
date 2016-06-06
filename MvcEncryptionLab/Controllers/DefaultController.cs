@@ -6,7 +6,8 @@ using System.Web.Mvc;
 using MvcEncryptionLabData;
 
 using Microsoft.AspNet.SignalR;
-using RealTimeProgressBar;  
+using RealTimeProgressBar;
+using System.Threading;  
 
 namespace MvcEncryptionLab.Controllers
 {
@@ -32,17 +33,31 @@ namespace MvcEncryptionLab.Controllers
         [HttpPost]
         public ActionResult RunLongProcess()
         {
-            ProgressHub.SendMessage("initializing and preparing", 40);
+            foreach (int index in Enumerable.Range(1, 10))
+            {
+                ProgressHub.SendMessage("Processed next 1000 records " + index, index * 10);
+                Thread.Sleep(2000);
+            }
 
-            Logger logger = new Logger();
-            DAL dal = new DAL();
+            //ProgressHub.SendMessage("initializing and preparing", 1);
 
-            dal.RunReallyLongProcess(logger);
+            //Thread.Sleep(2000);
 
-            Guid processId = dal.GetMostRecentProcess();
+            //ProgressHub.SendMessage("initializing and preparing", 1);
+
+            //ProgressHub.SendMessage("initializing and preparing", 1);
+
+            //ProgressHub.SendMessage("initializing and preparing", 1);
+
+            //DAL dal = new DAL();
+
+            //dal.RunReallyLongProcess();
+
+            //Guid processId = dal.GetMostRecentProcess();
 
             // TODO: how to return processId to client?
-            return this.Json(new { processId = processId.ToString() });
+            //return this.Json(new { processId = processId.ToString() });
+            return this.Json(new { processId = 12345 });
         }
 
         [HttpPost]

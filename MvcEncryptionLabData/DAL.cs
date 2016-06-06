@@ -411,7 +411,7 @@ namespace MvcEncryptionLabData
 
         #endregion
 
-        public void RunReallyLongProcess(Logger logger)
+        public void RunReallyLongProcess()
         {
             Process process = new Process()
             {
