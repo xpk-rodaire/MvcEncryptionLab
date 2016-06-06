@@ -45,5 +45,8 @@ namespace MvcEncryptionLabData
         {
             return base.ToString();
         }
+
+        //[Required]
+        //public string FakeFIeld { get; set; }
     }
 }

@@ -3,6 +3,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@using RealTimeProgressBar
+
 <h2>Simulated Home Page</h2>
 
 <div>@Html.ActionLink("1) Page With Encrypt/Decrypt Operation", "EncryptOperation", "Default")</div>
@@ -12,11 +14,46 @@
 <div>@Html.ActionLink("2) Page Without Encrypt/Decrypt Operation", "NoEncryptOperation", "Default2")</div>
 
 
-@using (Html.BeginForm("Edit", "Transmission", FormMethod.Post))
+@using (Html.BeginForm("RunLongProcess", "Default", FormMethod.Post))
 {
-    <div class="progress">
-        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:70%">
-            <span>40% Complete (success)</span>
-        </div>
+    <input type="submit" value="Launch Lengthy Process" />
+}
+
+<div class="progressBar">
+    <div id="progressbar" class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+         aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:70%">
+        <span>40% Complete (success)</span>
     </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(function () {
+            StartInvoicing();
+        });
+
+        function StartInvoicing() {
+            var progressNotifier = $.connection.progressHub;
+
+            // client-side sendMessage function that will be called from the server-side
+            progressNotifier.client.sendMessage = function (message, count) {
+                UpdateProgress(message, count);
+            };
+
+            // establish the connection to the server and start server-side operation
+            $.connection.hub.start().done(
+                function () {
+                    // call the method CallLongOperation defined in the Hub
+                    progressNotifier.server.getCountAndMessage();
+                }
+            );
+        }
+
+        function UpdateProgress(message, count) {
+            var result = $("#result");
+            result.html(message);
+            $("#progressbar").css("width", count);
+        }
+    </script>
 }
