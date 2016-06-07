@@ -8,6 +8,8 @@ using System.Threading;
 
 namespace MvcEncryptionLabData
 {
+    public delegate void ProgressStatusDelegate(string text, int percentComplete);
+
     public class DAL
     {
         public bool SecurityKeyExists()
@@ -273,7 +275,6 @@ namespace MvcEncryptionLabData
         }
 
        #endregion
-
         #region Log Item
 
         public void AddLogItem(
@@ -411,7 +412,7 @@ namespace MvcEncryptionLabData
 
         #endregion
 
-        public void RunReallyLongProcess()
+        public void RunReallyLongProcess(ProgressStatusDelegate progressDelegate)
         {
             Process process = new Process()
             {
@@ -432,35 +433,58 @@ namespace MvcEncryptionLabData
                 number: 2
             );
 
-            this.AddLogItem(process.Start());
+            LogItem logItem = process.Start();
+            progressDelegate(logItem.Text, process.PercentComplete);
+            this.AddLogItem(logItem);
 
             Thread.Sleep(2000);
 
             ProcessPhase phase1 = process.Phases[0];
-            this.AddLogItem(phase1.Start());
+            logItem = phase1.Start();
+            progressDelegate(logItem.Text, process.PercentComplete);
+            this.AddLogItem(logItem);
 
             foreach (int index in Enumerable.Range(1, 10))
             {
                 phase1.PercentComplete = index * 10;
-                this.AddLogItem(phase1.LogItem("Processed next 1000 records"));
+                logItem = phase1.LogItem("Processed next 1000 records");
+                progressDelegate(logItem.Text, process.PercentComplete);
+                this.AddLogItem(logItem);
                 Thread.Sleep(1000);
             }
 
-            this.AddLogItem(phase1.Finish());
+            logItem = phase1.Finish();
+            progressDelegate(logItem.Text, process.PercentComplete);
+            this.AddLogItem(logItem);
 
             Thread.Sleep(2000);
 
             ProcessPhase phase2 = process.Phases[1];
 
-            this.AddLogItem(phase2.Start());
+            logItem = phase2.Start();
+            progressDelegate(logItem.Text, process.PercentComplete);
+            this.AddLogItem(logItem);
+
+            foreach (int index in Enumerable.Range(1, 20))
+            {
+                phase2.PercentComplete = index * 5;
+                logItem = phase2.LogItem("Processed next 1000 records");
+                progressDelegate(logItem.Text, process.PercentComplete);
+                this.AddLogItem(logItem);
+                Thread.Sleep(1000);
+            }
 
             Thread.Sleep(2000);
 
-            this.AddLogItem(process.Phases[1].Finish());
+            logItem = phase2.Finish();
+            progressDelegate(logItem.Text, process.PercentComplete);
+            this.AddLogItem(logItem);
 
             Thread.Sleep(2000);
 
-            this.AddLogItem(process.Finish());
+            logItem = process.Finish();
+            progressDelegate(logItem.Text, process.PercentComplete);
+            this.AddLogItem(logItem);
         }
     }
 }

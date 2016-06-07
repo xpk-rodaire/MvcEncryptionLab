@@ -312,7 +312,7 @@ namespace MvcEncryptionLab.Tests
 
             //Guid pid = dal.GetMostRecentProcess();
 
-            dal.RunReallyLongProcess();
+            //dal.RunReallyLongProcess();
         }
     }
 }

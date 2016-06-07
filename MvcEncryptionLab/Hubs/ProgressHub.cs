@@ -15,9 +15,8 @@ namespace RealTimeProgressBar
 
         public static void SendMessage(string msg, int count)
         {
-            var message = "Process completed for " + msg;
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<ProgressHub>();
-            hubContext.Clients.All.sendMessage(string.Format(message), count);
+            hubContext.Clients.All.sendMessage(msg, count);
         }
 
         public void GetCountAndMessage()

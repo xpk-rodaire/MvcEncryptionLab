@@ -32,11 +32,10 @@ namespace MvcEncryptionLabData
 
         public DateTime? StartTime { get; set; }
         public TimeSpan? Duration { get; set; }
-        public int PercentComplete
+        public virtual int PercentComplete
         {
             get
             {
-                // Based on progress of phases?
                 return this._percentComplete;
             }
 
@@ -83,26 +82,21 @@ namespace MvcEncryptionLabData
 
         public LogItem Start()
         {
+            this.PercentComplete = 0;
             this.StartTime = DateTime.Now;
             this._stopwatch.Start();
-            return LogItem(
-                String.Format(
-                    "Starting {0}",
-                    this.LogDescription,
-                    this.Description
-                )
-            );
+            return LogItem("starting");
         }
 
         public LogItem Finish()
         {
+            this.PercentComplete = 100;
             this._stopwatch.Stop();
             this.Duration = this._stopwatch.Elapsed;
             this._stopwatch.Reset();
             return LogItem(
                 String.Format(
-                    "Finished {0} in {1} seconds",
-                    this.LogDescription,
+                    "finished in {0} seconds",
                     this.Duration.Value.TotalSeconds.ToString("#,##0")
                 )
             );
@@ -115,7 +109,7 @@ namespace MvcEncryptionLabData
                 Target = "",
                 CreateDateTime = DateTime.Now,
                 Text = String.Format(
-                    "{0} - {1}",
+                    "{0} - {1}.",
                     this.LogDescription,
                     text
                 ),
@@ -132,6 +126,21 @@ namespace MvcEncryptionLabData
             : base()
         {
             this.Phases = new List<ProcessPhase>();
+        }
+
+        public override int PercentComplete
+        {
+            get
+            {
+                int valuePerPhase = (int)((float)100 / this.Phases.Count);
+                int value = 0;
+
+                foreach (ProcessPhase phase in this.Phases)
+                {
+                    value += (valuePerPhase * phase.PercentComplete);
+                }
+                return (int)((float)value / 100);
+            }
         }
 
         protected override string LogDescription

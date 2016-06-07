@@ -13,6 +13,11 @@ namespace MvcEncryptionLab.Controllers
 {
     public class DefaultController : ApplicationController
     {
+        public static void SendProgressMessageDelegateMethod(string text, int percentComplete)
+        {
+            ProgressHub.SendMessage(text, percentComplete);
+        }
+
         // GET: Default
         public ActionResult Index()
         {
@@ -33,25 +38,15 @@ namespace MvcEncryptionLab.Controllers
         [HttpPost]
         public ActionResult RunLongProcess()
         {
-            foreach (int index in Enumerable.Range(1, 10))
-            {
-                ProgressHub.SendMessage("Processed next 1000 records " + index, index * 10);
-                Thread.Sleep(2000);
-            }
+            //foreach (int index in Enumerable.Range(1, 10))
+            //{
+            //    ProgressHub.SendMessage("Processed next 1000 records " + index, index * 10);
+            //    Thread.Sleep(2000);
+            //}
 
-            //ProgressHub.SendMessage("initializing and preparing", 1);
+            DAL dal = new DAL();
 
-            //Thread.Sleep(2000);
-
-            //ProgressHub.SendMessage("initializing and preparing", 1);
-
-            //ProgressHub.SendMessage("initializing and preparing", 1);
-
-            //ProgressHub.SendMessage("initializing and preparing", 1);
-
-            //DAL dal = new DAL();
-
-            //dal.RunReallyLongProcess();
+            dal.RunReallyLongProcess(SendProgressMessageDelegateMethod);
 
             //Guid processId = dal.GetMostRecentProcess();
 
