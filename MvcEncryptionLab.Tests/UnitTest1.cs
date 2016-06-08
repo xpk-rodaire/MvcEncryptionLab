@@ -319,14 +319,24 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformManifestXmlFile()
         {
-            string fileIn = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest.xml";
-            string fileOut = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest Out.xml";
+            string fileIn = @"Z:\Utility\SCO2015_Orig0000\SCO2015_Orig0000_Manifest.xml";
+            string fileOut = @"Z:\Utility\SCO2015_Orig0000 Transform\SCO2015_Orig0000_Manifest.xml";
 
             File.Copy(fileIn, fileOut, true);
 
             XmlDocument document = new XmlDocument();
             document.Load(fileOut);
             XPathNavigator navigator = document.CreateNavigator();
+
+            foreach (XmlNode node in document)
+            {
+                if (node.NodeType == XmlNodeType.XmlDeclaration)
+                {
+                    XmlDeclaration dec = (XmlDeclaration)node;
+                    dec.Encoding = "UTF-8";
+                    break;
+                }
+            }
 
             // <p:ACAUIBusinessHeader xmlns:p="urn:us:gov:treasury:irs:msg:acauibusinessheader"
             //    xmlns:acaBusHeader="urn:us:gov:treasury:irs:msg:acabusinessheader"
@@ -368,14 +378,24 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformFormDataXmlFile()
         {
-            string fileIn = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\TestAll_Orig0000\1094C_Request_XXXXX_20160607T112808000Z.xml";
-            string fileOut = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\TestAll_Orig0000\1094C_Request_XXXXX_20160607T112808000Z Transform.xml";
+            string fileIn = @"Z:\Utility\SCO2015_Orig0000\1094C_Request_BB0KC_20160607T081636000Z.xml";
+            string fileOut = @"Z:\Utility\SCO2015_Orig0000 Transform\1094C_Request_BB0KC_20160607T081636000Z.xml";
 
             File.Copy(fileIn, fileOut, true);
 
             XmlDocument document = new XmlDocument();
             document.Load(fileOut);
             XPathNavigator navigator = document.CreateNavigator();
+
+            foreach (XmlNode node in document)
+            {
+                if (node.NodeType == XmlNodeType.XmlDeclaration)
+                {
+                    XmlDeclaration dec = (XmlDeclaration)node;
+                    dec.Encoding = "UTF-8";
+                    break;
+                }
+            }
 
             // <n1:Form109495CTransmittalUpstream
             //    xmlns="urn:us:gov:treasury:irs:ext:aca:air:7.0"
@@ -430,7 +450,6 @@ namespace MvcEncryptionLab.Tests
                 {
                     XmlElement element = (XmlElement)node;
                     element.RemoveAttribute("xmlns");
-                    //element.RemoveAllAttributes();
                 }
             }
         }
