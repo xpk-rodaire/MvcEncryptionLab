@@ -447,7 +447,7 @@ namespace MvcEncryptionLab.Tests
             XmlNodeList list = document.DocumentElement.SelectNodes(f1095CXpath, manager);
             foreach (XmlNode node in list)
             {
-                XmlElement elem = document.CreateElement("PersonNameControlTxt");
+                XmlElement elem = document.CreateElement("PersonNameControlTxt", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
                 elem.InnerText = "ZZZ";
                 node.ParentNode.InsertAfter(elem, node);
             }
