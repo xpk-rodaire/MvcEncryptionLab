@@ -319,8 +319,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformManifestXmlFile()
         {
-            string fileIn = @"C:\Users\slchampeau\Downloads\_ACA-IRS\XML Files\SCO2015_Orig0000_Manifest.xml";
-            string fileOut = @"C:\Users\slchampeau\Downloads\_ACA-IRS\XML Files\SCO2015_Orig0000_Manifest Out.xml";
+            string fileIn = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest.xml";
+            string fileOut = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest Out.xml";
 
             File.Copy(fileIn, fileOut, true);
 
@@ -343,8 +343,6 @@ namespace MvcEncryptionLab.Tests
             manager.AddNamespace("irs", "urn:us:gov:treasury:irs:common");
             manager.AddNamespace("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd");
             manager.AddNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-
-            XmlElement root = document.DocumentElement;
 
             document.DocumentElement.RemoveAllAttributes();
 
@@ -370,8 +368,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformFormDataXmlFile()
         {
-            string fileIn = @"";
-            string fileOut = @"";
+            string fileIn = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\TestAll_Orig0000\1094C_Request_XXXXX_20160607T112808000Z.xml";
+            string fileOut = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\TestAll_Orig0000\1094C_Request_XXXXX_20160607T112808000Z Transform.xml";
 
             File.Copy(fileIn, fileOut, true);
 
@@ -379,20 +377,18 @@ namespace MvcEncryptionLab.Tests
             document.Load(fileOut);
             XPathNavigator navigator = document.CreateNavigator();
 
-            // <n1:Form109495BTransmittalUpstream
+            // <n1:Form109495CTransmittalUpstream
             //    xmlns="urn:us:gov:treasury:irs:ext:aca:air:7.0"
             //    xmlns:irs="urn:us:gov:treasury:irs:common"
             //    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            //    xmlns:n1="urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage"
-            //    xsi:schemaLocation="urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage IRS-Form1094-1095BTransmitterUpstreamMessage.xsd">
+            //    xmlns:n1="urn:us:gov:treasury:irs:msg:form1094-1095Ctransmitterupstreammessage"
+            //    xsi:schemaLocation="urn:us:gov:treasury:irs:msg:form1094-1095Ctransmitterupstreammessage IRS-Form1094-1095CTransmitterUpstreamMessage.xsd">
 
             XmlNamespaceManager manager = new XmlNamespaceManager(navigator.NameTable);
+            manager.AddNamespace("n1", "urn:us:gov:treasury:irs:msg:form1094-1095Ctransmitterupstreammessage");
             manager.AddNamespace("air", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
             manager.AddNamespace("irs", "urn:us:gov:treasury:irs:common");
             manager.AddNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            manager.AddNamespace("n1", "urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage");
-
-            XmlElement root = document.DocumentElement;
 
             document.DocumentElement.RemoveAllAttributes();
 
@@ -400,13 +396,14 @@ namespace MvcEncryptionLab.Tests
             document.DocumentElement.SetAttribute("xmlns", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
             document.DocumentElement.SetAttribute("xmlns:irs", "urn:us:gov:treasury:irs:common");
             document.DocumentElement.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            document.DocumentElement.SetAttribute("xmlns:n1", "urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage");            
+            document.DocumentElement.SetAttribute("xmlns:n1", "urn:us:gov:treasury:irs:msg:form1094-1095Ctransmitterupstreammessage");
             XmlAttribute attr = document.CreateAttribute("xsi", "schemaLocation", "http://www.w3.org/2001/XMLSchema-instance");
-            attr.Value = "urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage IRS-Form1094-1095BTransmitterUpstreamMessage.xsd";
+            attr.Value = "urn:us:gov:treasury:irs:msg:form1094-1095Ctransmitterupstreammessage IRS-Form1094-1095CTransmitterUpstreamMessage.xsd";
             document.DocumentElement.Attributes.Append(attr);
 
             ProcessNamespace(document, manager, "n1", true, false);
             ProcessNamespace(document, manager, "irs", true, true);
+            ProcessNamespace(document, manager, "air", false, true);
 
             document.Save(fileOut);
         }
@@ -432,7 +429,8 @@ namespace MvcEncryptionLab.Tests
                 if (removeNamespaceAttribute)
                 {
                     XmlElement element = (XmlElement)node;
-                    element.RemoveAllAttributes();
+                    element.RemoveAttribute("xmlns");
+                    //element.RemoveAllAttributes();
                 }
             }
         }
