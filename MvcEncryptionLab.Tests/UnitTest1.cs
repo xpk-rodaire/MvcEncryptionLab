@@ -316,72 +316,39 @@ namespace MvcEncryptionLab.Tests
             //dal.RunReallyLongProcess();
         }
 
-        //[TestMethod]
-        public void TestTransformXmlFile2()
-        {
-            string manifestFileIn = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest.xml";
-            string manifestFileOut = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest Out.xml";
-
-            XmlDocument documentOut = new XmlDocument();
-            XPathNavigator navigatorOut = documentOut.CreateNavigator();
-
-            XmlNamespaceManager managerOut = new XmlNamespaceManager(navigatorOut.NameTable);
-            managerOut.AddNamespace("xmlns:p", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
-            managerOut.AddNamespace("xmlns:acaBusHeader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
-            managerOut.AddNamespace("", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
-            managerOut.AddNamespace("xmlns:irs", "urn:us:gov:treasury:irs:common");
-            managerOut.AddNamespace("xmlns:wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd");
-            managerOut.AddNamespace("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            managerOut.AddNamespace("xsi:schemaLocation", "urn:us:gov:treasury:irs:msg:acauibusinessheader IRSACAUserInterfaceHeaderMessage.xsd");
-
-            XmlDeclaration xml_declaration = documentOut.CreateXmlDeclaration("1.0", "utf-8", null);
-            XmlElement rootOut = documentOut.CreateElement("p", "ACAUIBusinessHeader", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
-            documentOut.AppendChild(rootOut);
-            documentOut.InsertBefore(xml_declaration, documentOut.DocumentElement);
-
-            documentOut.DocumentElement.RemoveAllAttributes();
-
-            documentOut.DocumentElement.SetAttribute("xmlns:p", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
-            documentOut.DocumentElement.SetAttribute("xmlns:acaBusHeader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
-            documentOut.DocumentElement.SetAttribute("xmlns", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
-            documentOut.DocumentElement.SetAttribute("xmlns:irs", "urn:us:gov:treasury:irs:common");
-            documentOut.DocumentElement.SetAttribute("xmlns:wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd");
-            documentOut.DocumentElement.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            documentOut.DocumentElement.SetAttribute("xsi:schemaLocation", "urn:us:gov:treasury:irs:msg:acauibusinessheader IRSACAUserInterfaceHeaderMessage.xsd");
-            
-            //XmlDocument documentIn = new XmlDocument();
-            //documentIn.Load(manifestFileIn);
-            //XmlElement rootIn = documentIn.DocumentElement.SelectSingleNode("//book");
-            //XmlNode node = documentOut.ImportNode(rootIn, true);
-            //documentOut.DocumentElement.AppendChild(node);
-            //documentOut.Save(manifestFileOut);
-        }
-
         [TestMethod]
-        public void TestTransformXmlFile()
+        public void TestTransformManifestXmlFile()
         {
-            string manifestFileIn = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest.xml";
-            string manifestFileOut = @"C:\Users\schampea\Downloads\IRS-ACA\Match IRS Schema Names\SCO2015_Orig0000_Manifest Out.xml";
+            string fileIn = @"C:\Users\slchampeau\Downloads\_ACA-IRS\XML Files\SCO2015_Orig0000_Manifest.xml";
+            string fileOut = @"C:\Users\slchampeau\Downloads\_ACA-IRS\XML Files\SCO2015_Orig0000_Manifest Out.xml";
 
-            File.Copy(manifestFileIn, manifestFileOut, true);
+            File.Copy(fileIn, fileOut, true);
 
             XmlDocument document = new XmlDocument();
-            document.Load(manifestFileOut);
+            document.Load(fileOut);
             XPathNavigator navigator = document.CreateNavigator();
 
+            // <p:ACAUIBusinessHeader xmlns:p="urn:us:gov:treasury:irs:msg:acauibusinessheader"
+            //    xmlns:acaBusHeader="urn:us:gov:treasury:irs:msg:acabusinessheader"
+            //    xmlns="urn:us:gov:treasury:irs:ext:aca:air:7.0"
+            //    xmlns:irs="urn:us:gov:treasury:irs:common"
+            //    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd"
+            //    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            //    xsi:schemaLocation="urn:us:gov:treasury:irs:msg:acauibusinessheader IRSACAUserInterfaceHeaderMessage.xsd">
+
             XmlNamespaceManager manager = new XmlNamespaceManager(navigator.NameTable);
-            //managerOut.AddNamespace("xmlns:p", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
+            manager.AddNamespace("p", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
             manager.AddNamespace("acaBusHeader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
-            manager.AddNamespace("", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
+            manager.AddNamespace("air", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
             manager.AddNamespace("irs", "urn:us:gov:treasury:irs:common");
             manager.AddNamespace("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd");
             manager.AddNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
             XmlElement root = document.DocumentElement;
-            root.Prefix = "p";
 
             document.DocumentElement.RemoveAllAttributes();
 
+            // These must be in this order
             document.DocumentElement.SetAttribute("xmlns:p", "urn:us:gov:treasury:irs:msg:acauibusinessheader");
             document.DocumentElement.SetAttribute("xmlns:acaBusHeader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
             document.DocumentElement.SetAttribute("xmlns", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
@@ -392,26 +359,65 @@ namespace MvcEncryptionLab.Tests
             attr.Value = "urn:us:gov:treasury:irs:msg:acauibusinessheader IRSACAUserInterfaceHeaderMessage.xsd";
             document.DocumentElement.Attributes.Append(attr);
 
-            ReplaceNamespaceAttributeWithPrefix(document, manager, "irs");
-            ReplaceNamespaceAttributeWithPrefix(document, manager, "acaBusHeader");
-            //RemoveNamespaceAttribute(document, manager);
-            //document = this.RemoveXmlns(document);
+            ProcessNamespace(document, manager, "p", true, false);
+            ProcessNamespace(document, manager, "irs", true, true);
+            ProcessNamespace(document, manager, "acaBusHeader", true, true);
+            ProcessNamespace(document, manager, "air", false, true);
 
-            //XmlNodeList list = document.SelectNodes(xpath, manager);
-            //foreach (XmlNode node in list)
-            //{
-            //    Debug.WriteLine(node.Name + "   " + node.ToString() + "   " + node.LocalName + "   " + node.Attributes[0].Name
-            //         + "   " + node.NamespaceURI + "    " + node.Prefix
-            //    );
-            //    XmlElement element = (XmlElement)node;
-            //    node.Prefix = "irs";
-            //    element.RemoveAllAttributes();
-            //}
-
-            document.Save(manifestFileOut);
+            document.Save(fileOut);
         }
 
-        public void ReplaceNamespaceAttributeWithPrefix(XmlDocument document, XmlNamespaceManager manager, string namespacePrefix)
+        [TestMethod]
+        public void TestTransformFormDataXmlFile()
+        {
+            string fileIn = @"";
+            string fileOut = @"";
+
+            File.Copy(fileIn, fileOut, true);
+
+            XmlDocument document = new XmlDocument();
+            document.Load(fileOut);
+            XPathNavigator navigator = document.CreateNavigator();
+
+            // <n1:Form109495BTransmittalUpstream
+            //    xmlns="urn:us:gov:treasury:irs:ext:aca:air:7.0"
+            //    xmlns:irs="urn:us:gov:treasury:irs:common"
+            //    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            //    xmlns:n1="urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage"
+            //    xsi:schemaLocation="urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage IRS-Form1094-1095BTransmitterUpstreamMessage.xsd">
+
+            XmlNamespaceManager manager = new XmlNamespaceManager(navigator.NameTable);
+            manager.AddNamespace("air", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
+            manager.AddNamespace("irs", "urn:us:gov:treasury:irs:common");
+            manager.AddNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            manager.AddNamespace("n1", "urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage");
+
+            XmlElement root = document.DocumentElement;
+
+            document.DocumentElement.RemoveAllAttributes();
+
+            // These must be in this order
+            document.DocumentElement.SetAttribute("xmlns", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
+            document.DocumentElement.SetAttribute("xmlns:irs", "urn:us:gov:treasury:irs:common");
+            document.DocumentElement.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            document.DocumentElement.SetAttribute("xmlns:n1", "urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage");            
+            XmlAttribute attr = document.CreateAttribute("xsi", "schemaLocation", "http://www.w3.org/2001/XMLSchema-instance");
+            attr.Value = "urn:us:gov:treasury:irs:msg:form1094-1095Btransmitterupstreammessage IRS-Form1094-1095BTransmitterUpstreamMessage.xsd";
+            document.DocumentElement.Attributes.Append(attr);
+
+            ProcessNamespace(document, manager, "n1", true, false);
+            ProcessNamespace(document, manager, "irs", true, true);
+
+            document.Save(fileOut);
+        }
+
+        public void ProcessNamespace(
+            XmlDocument document,
+            XmlNamespaceManager manager,
+            string namespacePrefix,
+            bool addNamespacePrefix,
+            bool removeNamespaceAttribute
+        )
         {
             XmlNodeList list = document.SelectNodes(
                 String.Format("//{0}:*", namespacePrefix),
@@ -419,19 +425,15 @@ namespace MvcEncryptionLab.Tests
             );
             foreach (XmlNode node in list)
             {
-                XmlElement element = (XmlElement)node;
-                node.Prefix = namespacePrefix;
-                element.RemoveAllAttributes();
-            }
-        }
-
-        public void RemoveNamespaceAttribute(XmlDocument document, XmlNamespaceManager manager)
-        {
-            XmlNodeList list = document.SelectNodes("//*[@xmlns]", manager);
-            foreach (XmlNode node in list)
-            {
-                XmlElement element = (XmlElement)node;
-                element.RemoveAllAttributes();
+                if (addNamespacePrefix)
+                {
+                    node.Prefix = namespacePrefix;
+                }
+                if (removeNamespaceAttribute)
+                {
+                    XmlElement element = (XmlElement)node;
+                    element.RemoveAllAttributes();
+                }
             }
         }
 
