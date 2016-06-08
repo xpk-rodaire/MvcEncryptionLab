@@ -319,8 +319,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformManifestXmlFile()
         {
-            string fileIn = @"Z:\Utility\SCO2015_Orig0000\SCO2015_Orig0000_Manifest.xml";
-            string fileOut = @"Z:\Utility\SCO2015_Orig0000 Transform\SCO2015_Orig0000_Manifest.xml";
+            string fileIn = @"C:\temp\ACA-IRS\SCO2015_Orig0000\SCO2015_Orig0000_Manifest.xml";
+            string fileOut = @"C:\temp\ACA-IRS\SCO2015_Orig0000 Transform\SCO2015_Orig0000_Manifest.xml";
 
             File.Copy(fileIn, fileOut, true);
 
@@ -378,8 +378,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformFormDataXmlFile()
         {
-            string fileIn = @"Z:\Utility\SCO2015_Orig0000\1094C_Request_BB0KC_20160607T081636000Z.xml";
-            string fileOut = @"Z:\Utility\SCO2015_Orig0000 Transform\1094C_Request_BB0KC_20160607T081636000Z.xml";
+            string fileIn = @"C:\temp\ACA-IRS\SCO2015_Orig0000\1094C_Request_BB0KC_20160607T081636000Z.xml";
+            string fileOut = @"C:\temp\ACA-IRS\SCO2015_Orig0000 Transform\1094C_Request_BB0KC_20160607T081636000Z.xml";
 
             File.Copy(fileIn, fileOut, true);
 
@@ -424,6 +424,33 @@ namespace MvcEncryptionLab.Tests
             ProcessNamespace(document, manager, "n1", true, false);
             ProcessNamespace(document, manager, "irs", true, true);
             ProcessNamespace(document, manager, "air", false, true);
+
+            //<n1:Form109495CTransmittalUpstream
+            //  <Form1094CUpstreamDetail recordType="String" lineNum="0">
+            //    <EmployerInformationGrp>
+            //      <BusinessName></BusinessName>
+            //      <BusinessNameControlTxt>ZZZZ</BusinessNameControlTxt
+
+            string f1094CXpath = "//n1:Form109495CTransmittalUpstream/air:Form1094CUpstreamDetail/air:EmployerInformationGrp/air:BusinessName";
+            XPathNavigator f1094CNav = navigator.SelectSingleNode(f1094CXpath, manager);
+            f1094CNav.InsertAfter("<BusinessNameControlTxt>ZZZZ</BusinessNameControlTxt>");
+
+            //<n1:Form109495CTransmittalUpstream
+            //  <Form1094CUpstreamDetail recordType="String" lineNum="0">
+            //    <Form1095CUpstreamDetail recordType="String" lineNum="0">
+            //      <EmployeeInfoGrp>
+            //        <OtherCompletePersonName></OtherCompletePersonName>
+            //        <PersonNameControlTxt>ZZZ</PersonNameControlTxt>
+
+            string f1095CXpath = "//n1:Form109495CTransmittalUpstream/air:Form1094CUpstreamDetail/air:Form1095CUpstreamDetail/air:EmployeeInfoGrp/air:OtherCompletePersonName";
+            
+            XmlNodeList list = document.DocumentElement.SelectNodes(f1095CXpath, manager);
+            foreach (XmlNode node in list)
+            {
+                XmlElement elem = document.CreateElement("PersonNameControlTxt");
+                elem.InnerText = "ZZZ";
+                node.ParentNode.InsertAfter(elem, node);
+            }
 
             document.Save(fileOut);
         }
