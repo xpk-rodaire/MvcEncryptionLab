@@ -339,7 +339,7 @@ namespace MvcEncryptionLab.Tests
             //    xmlns:acaBusHeader="urn:us:gov:treasury:irs:msg:acabusinessheader"
             //    xmlns="urn:us:gov:treasury:irs:ext:aca:air:7.0"
             //    xmlns:irs="urn:us:gov:treasury:irs:common"
-            //    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd"
+            //    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
             //    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             //    xsi:schemaLocation="urn:us:gov:treasury:irs:msg:acauibusinessheader IRSACAUserInterfaceHeaderMessage.xsd">
 
@@ -348,7 +348,7 @@ namespace MvcEncryptionLab.Tests
             manager.AddNamespace("acaBusHeader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
             manager.AddNamespace("air", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
             manager.AddNamespace("irs", "urn:us:gov:treasury:irs:common");
-            manager.AddNamespace("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd");
+            manager.AddNamespace("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             manager.AddNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
             document.DocumentElement.RemoveAllAttributes();
@@ -358,10 +358,10 @@ namespace MvcEncryptionLab.Tests
             document.DocumentElement.SetAttribute("xmlns:acaBusHeader", "urn:us:gov:treasury:irs:msg:acabusinessheader");
             document.DocumentElement.SetAttribute("xmlns", "urn:us:gov:treasury:irs:ext:aca:air:7.0");
             document.DocumentElement.SetAttribute("xmlns:irs", "urn:us:gov:treasury:irs:common");
-            document.DocumentElement.SetAttribute("xmlns:wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurityutility-1.0.xsd");
+            document.DocumentElement.SetAttribute("xmlns:wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             document.DocumentElement.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
             XmlAttribute attr = document.CreateAttribute("xsi", "schemaLocation", "http://www.w3.org/2001/XMLSchema-instance");
-            attr.Value = "urn:us:gov:treasury:irs:msg:acauibusinessheader IRSACAUserInterfaceHeaderMessage.xsd";
+            attr.Value = "urn:us:gov:treasury:irs:msg:acauibusinessheader IRS-ACAUserInterfaceHeaderMessage.xsd";
             document.DocumentElement.Attributes.Append(attr);
 
             ProcessNamespace(document, manager, "p", true, false);
