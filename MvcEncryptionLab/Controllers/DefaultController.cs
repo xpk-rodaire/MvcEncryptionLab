@@ -38,12 +38,6 @@ namespace MvcEncryptionLab.Controllers
         [HttpPost]
         public ActionResult RunLongProcess()
         {
-            //foreach (int index in Enumerable.Range(1, 10))
-            //{
-            //    ProgressHub.SendMessage("Processed next 1000 records " + index, index * 10);
-            //    Thread.Sleep(2000);
-            //}
-
             DAL dal = new DAL();
 
             dal.RunReallyLongProcess(SendProgressMessageDelegateMethod);
@@ -52,25 +46,7 @@ namespace MvcEncryptionLab.Controllers
 
             // TODO: how to return processId to client?
             //return this.Json(new { processId = processId.ToString() });
-            return this.Json(new { processId = 12345 });
-        }
-
-        [HttpPost]
-        public ActionResult GetProcessUpdate(Guid processId)
-        {
-            DAL dal = new DAL();
-
-            MvcEncryptionLabData.ProcessStatus status = dal.GetProcessStatus(processId);
-
-            return this.Json(
-                new
-                {
-                    processId = status.ProcessId,
-                    userName = status.UserName,
-                    percentComplete = status.PercentComplete,
-                    status = status.Status
-                }
-            );
+            return View();
         }
     }
 }

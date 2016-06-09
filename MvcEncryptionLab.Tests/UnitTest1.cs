@@ -310,10 +310,7 @@ namespace MvcEncryptionLab.Tests
         public void TestReallyLongProcess()
         {
             DAL dal = new DAL();
-
-            //Guid pid = dal.GetMostRecentProcess();
-
-            //dal.RunReallyLongProcess();
+            dal.RunReallyLongProcess(null);
         }
 
         [TestMethod]

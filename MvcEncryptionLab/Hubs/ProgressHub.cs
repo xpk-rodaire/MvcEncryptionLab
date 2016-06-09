@@ -10,8 +10,8 @@ namespace RealTimeProgressBar
     [Microsoft.AspNet.SignalR.Hubs.HubName("progressHub")]
     public class ProgressHub : Hub
     {
-        public string msg = "Initializing and Preparing...";
-        public int count = 1;
+        public string msg = "";
+        public int count = 0;
 
         public static void SendMessage(string msg, int count)
         {

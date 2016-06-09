@@ -4,31 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using MvcEncryptionLabData;
 
 namespace MvcEncryptionLabData
 {
-    public class ProcessStatus
-    {
-        public Guid ProcessId { get; set; }
-        public string UserName { get; set; }
-        public int PercentComplete { get; set; }
-        public string Status { get; set; }
-    }
-
-    public abstract class AbstractProcess
+    public class Process
     {
         private Stopwatch _stopwatch = new Stopwatch();
         private int _percentComplete = 0;
-
-        public AbstractProcess()
+        
+        public Process()
         {
             this.ProcessId = Guid.NewGuid();
+            this.SubProcesses = new List<Process>();
         }
 
-        public string Name { get; set;  }
+        public string Name { get; set; }
         public string Description { get; set; }
         public Guid ProcessId { get; protected set; }
         public string UserName { get; set; }
+        public Process Parent { get; set; }
+
+        public List<Process> SubProcesses { get; set; }
 
         public DateTime? StartTime { get; set; }
         public TimeSpan? Duration { get; set; }
@@ -36,27 +33,42 @@ namespace MvcEncryptionLabData
         {
             get
             {
-                return this._percentComplete;
+                if (this.SubProcesses.Count == 0)
+                {
+                    return this._percentComplete;
+                }
+                else
+                {
+                    int valuePerPhase = (int)((float)100 / this.SubProcesses.Count);
+                    int value = 0;
+
+                    foreach (Process process in this.SubProcesses)
+                    {
+                        value += (valuePerPhase * process.PercentComplete);
+                    }
+                    return (int)((float)value / 100);
+                }
             }
 
             set
             {
-                if (value < 0)
+                if (this.SubProcesses.Count == 0)
                 {
-                    this._percentComplete = 0;
-                }
-                else if (value > 100)
-                {
-                    this._percentComplete = 100;
-                }
-                else
-                {
-                    this._percentComplete = value;
+                    if (value < 0)
+                    {
+                        this._percentComplete = 0;
+                    }
+                    else if (value > 100)
+                    {
+                        this._percentComplete = 100;
+                    }
+                    else
+                    {
+                        this._percentComplete = value;
+                    }
                 }
             }
         }
-
-        protected abstract string LogDescription { get; }
 
         public bool NotStarted
         {
@@ -66,7 +78,7 @@ namespace MvcEncryptionLabData
             }
         }
         public bool Started
-        { 
+        {
             get
             {
                 return this.StartTime.HasValue && !this.Duration.HasValue;
@@ -104,13 +116,42 @@ namespace MvcEncryptionLabData
 
         public LogItem LogItem(string text)
         {
+            string processDesc;
+            if (this.Parent == null)
+            {
+                processDesc = String.Format(
+                    "Process '{0}' [{1}]",
+                    this.Name,
+                    this.Description
+                );
+            }
+            else
+            {
+                int subProcessIndex = 0;
+                for (int index = 0; index < this.Parent.SubProcesses.Count; ++index)
+                {
+                    if (this.Parent.SubProcesses[index] == this)
+                    {
+                        subProcessIndex = index + 1;
+                        break;
+                    }
+                }
+
+                processDesc = String.Format(
+                    "Sub process '{0}' [{1} of {2}]",
+                    this.Name,
+                    subProcessIndex,
+                    this.Parent.SubProcesses.Count()
+                );
+            }
+
             return new LogItem
             {
                 Target = "",
                 CreateDateTime = DateTime.Now,
                 Text = String.Format(
                     "{0} - {1}.",
-                    this.LogDescription,
+                    processDesc,
                     text
                 ),
                 Type = Logger.LogItemType.Info,
@@ -118,82 +159,18 @@ namespace MvcEncryptionLabData
                 ProcessPercentComplete = this.PercentComplete
             };
         }
-    }
 
-    public class Process : AbstractProcess
-    {
-        public Process()
-            : base()
+        public Process AddSubProcess(string name, string description)
         {
-            this.Phases = new List<ProcessPhase>();
-        }
-
-        public override int PercentComplete
-        {
-            get
-            {
-                int valuePerPhase = (int)((float)100 / this.Phases.Count);
-                int value = 0;
-
-                foreach (ProcessPhase phase in this.Phases)
-                {
-                    value += (valuePerPhase * phase.PercentComplete);
-                }
-                return (int)((float)value / 100);
-            }
-        }
-
-        protected override string LogDescription
-        {
-            get
-            {
-                return String.Format(
-                    "Process '{0}' [{1}]",
-                    this.Name,
-                    this.Description
-                );
-            }
-        }
-
-        public ProcessPhase AddProcessPhase(string name, string description, int number)
-        {
-            ProcessPhase newPhase = new ProcessPhase(this, this.ProcessId)
+            Process process = new Process()
             {
                 Name = name,
                 Description = description,
-                PhaseNumber = number
+                ProcessId = this.ProcessId,
+                Parent = this
             };
-            this.Phases.Add(newPhase);
-            return newPhase;
+            this.SubProcesses.Add(process);
+            return process;
         }
-
-        public List<ProcessPhase> Phases { get; set; }
-    }
-
-    public class ProcessPhase : AbstractProcess
-    {
-        private Process _parent;
-
-        public ProcessPhase(Process parent, Guid processId)
-            : base()
-        {
-            this._parent = parent;
-            this.ProcessId = processId;
-        }
-
-        protected override string LogDescription
-        {
-            get
-            {
-                return String.Format(
-                    "Process phase '{0}' [{1} of {2}]",
-                    this.Name,
-                    this.PhaseNumber,
-                    this._parent.Phases.Count()
-                );
-            }
-        }
-
-        public int PhaseNumber { get; set; }
     }
 }

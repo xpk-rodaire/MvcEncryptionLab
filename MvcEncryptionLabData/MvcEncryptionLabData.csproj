@@ -99,7 +99,6 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Process.cs" />
-    <Compile Include="Process2.cs" />
     <Compile Include="Random.cs" />
     <Compile Include="DAL.cs" />
     <Compile Include="DbEntities.cs" />
