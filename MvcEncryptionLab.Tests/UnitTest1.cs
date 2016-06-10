@@ -316,8 +316,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformManifestXmlFile()
         {
-            string fileIn = @"C:\temp\ACA-IRS\SCO2015_Orig0000\SCO2015_Orig0000_Manifest.xml";
-            string fileOut = @"C:\temp\ACA-IRS\SCO2015_Orig0000 Transform\SCO2015_Orig0000_Manifest.xml";
+            string fileIn = @"Z:\Utility\SCO2015B_Orig0000\SCO2015B_Orig0000_Manifest.xml";
+            string fileOut = @"Z:\Utility\SCO2015B_Orig0000 Transform\SCO2015B_Orig0000_Manifest.xml";
 
             File.Copy(fileIn, fileOut, true);
 
@@ -375,8 +375,8 @@ namespace MvcEncryptionLab.Tests
         [TestMethod]
         public void TestTransformFormDataXmlFile()
         {
-            string fileIn = @"C:\temp\ACA-IRS\SCO2015_Orig0000\1094C_Request_BB0KC_20160607T081636000Z.xml";
-            string fileOut = @"C:\temp\ACA-IRS\SCO2015_Orig0000 Transform\1094C_Request_BB0KC_20160607T081636000Z.xml";
+            string fileIn = @"Z:\Utility\SCO2015B_Orig0000\1094C_Request_BB0KC_20160610T022412000Z.xml";
+            string fileOut = @"Z:\Utility\SCO2015B_Orig0000 Transform\1094C_Request_BB0KC_20160610T022412000Z.xml";
 
             File.Copy(fileIn, fileOut, true);
 
