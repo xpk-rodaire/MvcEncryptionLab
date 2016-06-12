@@ -370,6 +370,10 @@ namespace MvcEncryptionLab.Tests
             ProcessNamespace(document, manager, "air", false, true);
 
             document.Save(fileOut);
+
+            // This will remove the BOM (Byte Order Mark)
+            string[] lines = File.ReadAllLines(fileOut);
+            File.WriteAllLines(fileOut, lines);
         }
 
         [TestMethod]
@@ -450,6 +454,10 @@ namespace MvcEncryptionLab.Tests
             }
 
             document.Save(fileOut);
+
+            // This will remove the BOM (Byte Order Mark)
+            string[] lines = File.ReadAllLines(fileOut);
+            File.WriteAllLines(fileOut, lines);
         }
 
         public void ProcessNamespace(
