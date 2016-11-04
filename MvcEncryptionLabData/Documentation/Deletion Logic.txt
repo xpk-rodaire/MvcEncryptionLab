@@ -1,0 +1,75 @@
+
+Form1094CUpstreamDetailType
+   ALEMemberInformationGrp_ALEMemberInformationGrpTypeId  
+   
+      ALEMemberInformationGrpType                                          DECLARE @ALEMemberInformationGrpType TABLE (id INT)
+	     JanALEMonthlyInfoGrp_ALEMemberMonthlyInfoGrpTypeId                DECLARE @ALEMemberMonthlyInfoGrpType TABLE (id INT)
+		 ...
+		 DecALEMonthlyInfoGrp_ALEMemberMonthlyInfoGrpTypeId
+    
+	     YearlyALEMemberDetail_ALEMemberAnnualInfoGrpTypeId                DECLARE @ALEMemberAnnualInfoGrpType TABLE (id INT)
+   
+   
+   CorrectedSubmissionInfoGrp_CorrectedSubmissionInfoGrpTypeId               DECLARE @CorrectedSubmissionInfoGrpType TABLE (id INT)
+   
+      CorrectedSubmissionInfoGrpType
+	     CorrectedSubmissionPayerName_BusinessNameTypeId
+   
+   EmployerInformationGrp_EmployerInformationGrpTypeId
+   
+      EmployerInformationGrpType                                              DECLARE @EmployerInformationGrpType TABLE (id INT)
+         BusinessName_BusinessNameTypeId                                      ***
+         ContactNameGrp_OtherCompletePersonNameTypeId                         ***
+         MailingAddressGrp_BusinessAddressGrpTypeId
+			BusinessAddressGrpTypeId
+			   ForeignAddressGrpType_ForeignAddressGrpTypeId
+			   USAddressGrpType_USAddressGrpTypeId 
+   
+   GovtEntityEmployerInfoGrp_GovtEntityEmployerInfoGrpTypeId                       DECLARE @GovtEntityEmployerInfoGrpType TABLE (id INT)
+   
+      GovtEntityEmployerInfoGrpType                                               
+	     BusinessName_BusinessNameTypeId                                          DECLARE @BusinessNameType TABLE (id INT)
+		 ContactNameGrp_OtherCompletePersonNameTypeId
+		 MailingAddressGrp_BusinessAddressGrpTypeId
+            
+			BusinessAddressGrpTypeId
+			   ForeignAddressGrpType_ForeignAddressGrpTypeId
+			   USAddressGrpType_USAddressGrpTypeId 
+   
+   Transmission_TransmissionId
+   
+Form1095CUpstreamDetailType
+   Form1094CUpstreamDetailType_Form1094CUpstreamDetailTypeId
+
+   CorrectedRecordInfoGrp_CorrectedRecordInfoGrpTypeId                             DECLARE @CorrectedRecordInfoGrpType TABLE (id INT)
+   
+      CorrectedRecordInfoGrpType
+	     CorrectedRecordPayeeName_OtherCompletePersonNameTypeId                    DECLARE @OtherCompletePersonNameType TABLE (id INT)
+	  
+   EmployeeInfoGrp_EmployeeInformationGrpTypeId                                    DECLARE @EmployeeInformationGrpType TABLE (id INT)
+   
+      EmployeeInformationGrpType
+         MailingAddressGrp_BusinessAddressGrpTypeId
+		 
+		    BusinessAddressGrpType                                                  DECLARE @BusinessAddressGrpType TABLE (id INT)
+			   BusinessAddressGrpTypeId
+			   
+			      ForeignAddressGrpType_ForeignAddressGrpTypeId                     DECLARE @ForeignAddressGrpType TABLE (id INT)
+			      USAddressGrpType_USAddressGrpTypeId                               DECLARE @USAddressGrpType TABLE (id INT)
+		 
+         OtherCompletePersonName_OtherCompletePersonNameTypeId                      DECLARE @OtherCompletePersonNameType TABLE (id INT)
+		 
+   EmployeeOfferAndCoverageGrp_EmployeeOfferAndCoverageGrpTypeId                    DECLARE @EmployeeOfferAndCoverageGrpType TABLE (id INT)
+   
+      EmployeeOfferAndCoverageGrpType
+	     MonthlyOfferCoverageGrp_OfferCoverageByMonthTypeId                         DECLARE @OfferCoverageByMonthType TABLE (id INT)
+		 MonthlySafeHarborGrp_MonthlySafeHarborCdTypeId                             DECLARE @MonthlySafeHarborCdType TABLE (id INT)
+		 MonthlyShareOfLowestCostMonthlyPremGrp_AmountByMonthDetailTypeId           DECLARE @AmountByMonthDetailType TABLE (id INT)
+		 
+EmployerCoveredIndividualType		                                                DECLARE @EmployerCoveredIndividualType TABLE (id INT)
+   CoveredIndividualMonthlyIndGrp_MonthIndGrpTypeId                                 DECLARE @MonthIndGrpType TABLE (id INT)
+   CoveredIndividualName_OtherCompletePersonNameTypeId                           
+   Form1095CUpstreamDetailType_Form1095CUpstreamDetailTypeId
+
+
+
