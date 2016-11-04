@@ -6,3 +6,9 @@
 
 <h2>Default - This Page Has NO Encrypt Operation</h2>
 
+@using (Html.BeginForm("RunLongProcess", "Default", FormMethod.Post, new { onsubmit = "ShowProgressDialog('Long Process From NO Encrypt Operation Page');" }))
+{
+    <input type="submit" value="Launch Lengthy Process" />
+}
+
+

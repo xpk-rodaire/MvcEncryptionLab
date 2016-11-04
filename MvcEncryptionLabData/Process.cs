@@ -42,9 +42,9 @@ namespace MvcEncryptionLabData
                     int valuePerPhase = (int)((float)100 / this.SubProcesses.Count);
                     int value = 0;
 
-                    foreach (Process process in this.SubProcesses)
+                    foreach (Process subProcess in this.SubProcesses)
                     {
-                        value += (valuePerPhase * process.PercentComplete);
+                        value += (valuePerPhase * subProcess.PercentComplete);
                     }
                     return (int)((float)value / 100);
                 }
@@ -154,7 +154,7 @@ namespace MvcEncryptionLabData
                     processDesc,
                     text
                 ),
-                Type = Logger.LogItemType.Info,
+                Type = LogItemType.Info,
                 ProcessId = this.ProcessId,
                 ProcessPercentComplete = this.PercentComplete
             };

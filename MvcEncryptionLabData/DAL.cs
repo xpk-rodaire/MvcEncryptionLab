@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace MvcEncryptionLabData
 {
-    public delegate void ProgressStatusDelegate(string text, int percentComplete);
+    public delegate void ProgressStatusDelegate(string text, int percentComplete, bool complete);
 
     public class DAL
     {
@@ -279,7 +279,7 @@ namespace MvcEncryptionLabData
 
         public void AddLogItem(
             string userName,
-            Logger.LogItemType type,
+            LogItemType type,
             string target,
             string text)
         {
@@ -303,7 +303,7 @@ namespace MvcEncryptionLabData
 
         public void AddLogItem(
             string userName,
-            Logger.LogItemType type,
+            LogItemType type,
             string target,
             string text,
             Guid processId,
@@ -342,19 +342,9 @@ namespace MvcEncryptionLabData
 
         private void _AddLogger(string userName, Logger logger, DbEntities context)
         {
-            foreach (Logger.LogItem item in logger.LogItems)
+            foreach (LogItem item in logger.LogItems)
             {
-                LogItem dbItem = new LogItem()
-                {
-                    UserName = userName,
-                    Target = item.Target,
-                    CreateDateTime = item.CreateDateTime,
-                    Text = item.Text,
-                    Type = item.Type,
-                    ProcessId = item.ProcessId,
-                    ProcessPercentComplete = item.ProcessPercentComplete
-                };
-                context.LogItem.Add(dbItem);
+                context.LogItem.Add(item);
             }
         }
 
@@ -412,8 +402,10 @@ namespace MvcEncryptionLabData
 
         #endregion
 
-        public void RunReallyLongProcess(ProgressStatusDelegate progressDelegate)
+        public void RunReallyLongProcess(ProgressStatusDelegate progressDelegate, out LogItem logItem)
         {
+            int pauseinMs = 50;
+
             Process topProcess = new Process()
             {
                 Name = "Test Process",
@@ -431,82 +423,87 @@ namespace MvcEncryptionLabData
                 description: "Test Sub Process 2 Description"
             );
 
-            LogItem logItem = topProcess.Start();
+            LogItem processLogItem = topProcess.Start();
             if (progressDelegate != null)
             {
-                progressDelegate(logItem.Text, topProcess.PercentComplete);
+                progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
             }
-            this.AddLogItem(logItem);
+            this.AddLogItem(processLogItem);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(pauseinMs);
 
             Process subProcess1 = topProcess.SubProcesses[0];
-            logItem = subProcess1.Start();
+            processLogItem = subProcess1.Start();
             if (progressDelegate != null)
             {
-                progressDelegate(logItem.Text, topProcess.PercentComplete);
+                progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
             }
-            this.AddLogItem(logItem);
+            this.AddLogItem(processLogItem);
 
             foreach (int index in Enumerable.Range(1, 10))
             {
                 subProcess1.PercentComplete = index * 10;
-                logItem = subProcess1.LogItem("Processed next 1000 records");
+                processLogItem = subProcess1.LogItem(String.Format("Processed {0:n0} records", 10000 / 10 * index));
                 if (progressDelegate != null)
                 {
-                    progressDelegate(logItem.Text, topProcess.PercentComplete);
+                    progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
                 }
-                this.AddLogItem(logItem);
-                Thread.Sleep(1000);
+                this.AddLogItem(processLogItem);
+                Thread.Sleep(pauseinMs);
             }
 
-            logItem = subProcess1.Finish();
+            processLogItem = subProcess1.Finish();
             if (progressDelegate != null)
             {
-                progressDelegate(logItem.Text, topProcess.PercentComplete);
+                progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
             }
-            this.AddLogItem(logItem);
+            this.AddLogItem(processLogItem);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(pauseinMs);
 
             Process subProcess2 = topProcess.SubProcesses[1];
 
-            logItem = subProcess2.Start();
+            processLogItem = subProcess2.Start();
             if (progressDelegate != null)
             {
-                progressDelegate(logItem.Text, topProcess.PercentComplete);
+                progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
             }
-            this.AddLogItem(logItem);
+            this.AddLogItem(processLogItem);
 
             foreach (int index in Enumerable.Range(1, 20))
             {
                 subProcess2.PercentComplete = index * 5;
-                logItem = subProcess2.LogItem("Processed next 1000 records");
+                processLogItem = subProcess2.LogItem(String.Format("Processed {0:n0} records", 10000 / 20 * index));
                 if (progressDelegate != null)
                 {
-                    progressDelegate(logItem.Text, topProcess.PercentComplete);
+                    progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
                 }
-                this.AddLogItem(logItem);
-                Thread.Sleep(1000);
+                this.AddLogItem(processLogItem);
+                Thread.Sleep(pauseinMs);
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(pauseinMs);
 
-            logItem = subProcess2.Finish();
+            processLogItem = subProcess2.Finish();
             if (progressDelegate != null)
             {
-                progressDelegate(logItem.Text, topProcess.PercentComplete);
+                progressDelegate(processLogItem.Text, topProcess.PercentComplete, false);
             }
-            this.AddLogItem(logItem);
+            this.AddLogItem(processLogItem);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(pauseinMs);
 
-            logItem = topProcess.Finish();
+            processLogItem = topProcess.Finish();
             if (progressDelegate != null)
             {
-                progressDelegate(logItem.Text, topProcess.PercentComplete);
+                progressDelegate(processLogItem.Text, topProcess.PercentComplete, true);
+                logItem = processLogItem;
             }
-            this.AddLogItem(logItem);
+            else
+            {
+                logItem = null;
+            }
+            this.AddLogItem(processLogItem);
         }
     }
 }

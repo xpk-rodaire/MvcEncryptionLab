@@ -26,10 +26,10 @@ function promptForKey(keyExists, controllerName) {
                                 return false;
                             }
                             $.ajax({
-                                url: "/" + controllerName + "/PostSecurityKey",
-                                type: "POST",
+                                url: '/' + controllerName + '/PostSecurityKey',
+                                type: 'POST',
                                 data: { 'key': key1 },
-                                dataType: "json",
+                                dataType: 'json',
                                 success: function (data) {
                                     showDialog('Hash of key has been saved to database and will be used to validate future entries of the key.');
                                 },
@@ -41,7 +41,7 @@ function promptForKey(keyExists, controllerName) {
                             dialogRef.close();
                             
                         } else {
-                            alert("Key values do not match.");
+                            alert('Key values do not match.');
                         }
                     }
                 },
@@ -74,10 +74,10 @@ function promptForKey(keyExists, controllerName) {
                         }
 
                         $.ajax({
-                            url: "/" + controllerName + "/PostSecurityKey",
-                            type: "POST",
+                            url: '/' + controllerName + '/PostSecurityKey',
+                            type: 'POS',
                             data: { 'key': key },
-                            dataType: "json",
+                            dataType: 'json',
                             success: function (data) {
                                 showDialog('Security key valid.');
                             },
@@ -118,7 +118,7 @@ function showDialog(message) {
 }
 
 function gotoHomePage() {
-    window.location.replace("/Default/Index/");
+    window.location.replace('/Default/Index/');
 }
 
 function validateKey(value)
@@ -132,4 +132,40 @@ function validateKey(value)
         return false;
     }
     return true;
+}
+
+function ShowProgressDialog(dialogTitle) {
+    var progressNotifier = $.connection.progressHub;
+
+    // client-side sendMessage function that will be called from the server-side
+    progressNotifier.client.sendMessage = function (message, percentage, complete) {
+        UpdateProgress(message, percentage, complete);
+    };
+
+    // establish the connection to the server and start server-side operation
+    $.connection.hub.start().done(
+        function () {
+           //progressNotifier.server.getCountAndMessage();
+        }
+    );
+
+    var dialog = BootstrapDialog.show({
+        closable: false,
+        size: BootstrapDialog.SIZE_LARGE,
+        title: dialogTitle,
+        cssClass: 'sco-modal',
+        message:
+              '<div class="progress">'
+            + '<div class="bar" style="width:0%"></div>'
+            + '<span></span>'
+            + '</div>'
+        }
+    );
+
+    dialog.enableButtons(false);
+}
+
+function UpdateProgress(message, percentage, complete) {
+    $('.bar').css('width', percentage + '%');
+    $('.progress span').text(message);
 }

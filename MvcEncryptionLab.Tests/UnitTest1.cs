@@ -310,7 +310,8 @@ namespace MvcEncryptionLab.Tests
         public void TestReallyLongProcess()
         {
             DAL dal = new DAL();
-            dal.RunReallyLongProcess(null);
+            LogItem logItem;
+            dal.RunReallyLongProcess(null, out logItem);
         }
 
         [TestMethod]

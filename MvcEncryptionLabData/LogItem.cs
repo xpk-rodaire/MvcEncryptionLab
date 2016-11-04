@@ -34,7 +34,7 @@ namespace MvcEncryptionLabData
         [MaxLength(5000)]
         public string Text { get; set; }
 
-        public Logger.LogItemType Type { get; set; }
+        public LogItemType Type { get; set; }
 
         public Guid ProcessId { get; set; }
 
@@ -46,7 +46,20 @@ namespace MvcEncryptionLabData
             return base.ToString();
         }
 
-        //[Required]
-        //public string FakeFIeld { get; set; }
+        public void Copy(LogItem logItem)
+        {
+            this.UserName = logItem.UserName;
+            this.Target = logItem.Target;
+            this.CreateDateTime = logItem.CreateDateTime;
+            this.Text = logItem.Text;
+            this.ProcessPercentComplete = logItem.ProcessPercentComplete;
+        }
+    }
+
+    public enum LogItemType
+    {
+        Info,
+        Warning,
+        Error
     }
 }

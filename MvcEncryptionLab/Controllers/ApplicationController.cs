@@ -5,6 +5,9 @@ using System.Web;
 using System.Web.Mvc;
 using MvcEncryptionLabData;
 
+using Microsoft.AspNet.SignalR;
+using RealTimeProgressBar;
+
 namespace MvcEncryptionLab.Controllers
 {
     public abstract class ApplicationController : Controller
@@ -63,6 +66,11 @@ namespace MvcEncryptionLab.Controllers
                     return this.Json(new { status = "success" });
                 }
             }
+        }
+
+        protected static void SendProgressMessageDelegateMethod(string text, int percentComplete, bool complete)
+        {
+            ProgressHub.SendMessage(text, percentComplete, complete);
         }
     }
 }

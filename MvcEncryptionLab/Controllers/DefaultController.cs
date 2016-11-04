@@ -13,13 +13,8 @@ namespace MvcEncryptionLab.Controllers
 {
     public class DefaultController : ApplicationController
     {
-        public static void SendProgressMessageDelegateMethod(string text, int percentComplete)
-        {
-            ProgressHub.SendMessage(text, percentComplete);
-        }
-
         // GET: Default
-        public ActionResult Index()
+        public ActionResult Index(LogItem logItem)
         {
             return View();
         }
@@ -39,14 +34,10 @@ namespace MvcEncryptionLab.Controllers
         public ActionResult RunLongProcess()
         {
             DAL dal = new DAL();
-
-            dal.RunReallyLongProcess(SendProgressMessageDelegateMethod);
-
-            //Guid processId = dal.GetMostRecentProcess();
-
-            // TODO: how to return processId to client?
-            //return this.Json(new { processId = processId.ToString() });
-            return View();
+            LogItem logItem = null;
+            dal.RunReallyLongProcess(SendProgressMessageDelegateMethod, out logItem);
+            ViewBag.Message = logItem.Text;
+            return View("Index");
         }
     }
 }

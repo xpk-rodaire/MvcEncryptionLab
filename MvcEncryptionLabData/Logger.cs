@@ -8,46 +8,6 @@ namespace MvcEncryptionLabData
 {
     public class Logger
     {
-        public enum LogItemType
-        {
-            Info,
-            Warning,
-            Error
-        }
-
-        public class LogItem
-        {
-            public LogItem()
-            {
-            }
-
-            public LogItem(DateTime dateTime, string text, Logger.LogItemType type)
-            {
-                this.CreateDateTime = dateTime;
-                this.Text = text;
-                this.Type = type;
-            }
-
-            public int LogItemId { get; set; }
-
-            public string Target { get; set; }
-
-            public DateTime CreateDateTime { get; set; }
-
-            public string Text { get; set; }
-
-            public Logger.LogItemType Type { get; set; }
-
-            public Guid ProcessId { get; set; }
-
-            public int ProcessPercentComplete { get; set; }
-
-            public override string ToString()
-            {
-                return Text;
-            }
-        }
-
         private List<LogItem> _log = new List<LogItem>();
         private Dictionary<LogItemType, int> _logItemCounts = new Dictionary<LogItemType, int>();
 
