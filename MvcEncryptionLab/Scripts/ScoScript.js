@@ -143,13 +143,14 @@ function ShowProgressDialog(dialogTitle) {
     };
 
     // establish the connection to the server and start server-side operation
-    $.connection.hub.start().done(
-        function () {
-           //progressNotifier.server.getCountAndMessage();
-        }
-    );
+    $.connection.hub.start();
+    //.done(
+    //    function () {
+    //       //progressNotifier.server.getCountAndMessage();
+    //    }
+    //);
 
-    var dialog = BootstrapDialog.show({
+    BootstrapDialog.show({
         closable: false,
         size: BootstrapDialog.SIZE_LARGE,
         title: dialogTitle,
@@ -161,8 +162,6 @@ function ShowProgressDialog(dialogTitle) {
             + '</div>'
         }
     );
-
-    dialog.enableButtons(false);
 }
 
 function UpdateProgress(message, percentage, complete) {

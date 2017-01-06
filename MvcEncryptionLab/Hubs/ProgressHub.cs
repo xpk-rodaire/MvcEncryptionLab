@@ -31,9 +31,9 @@ namespace RealTimeProgressBar
             hubContext.Clients.All.sendMessage(msg, count, complete);
         }
 
-        public void GetCountAndMessage()
-        {
-            //Clients.Caller.sendMessage(string.Format(msg), count);
-        }
+        //public void GetCountAndMessage()
+        //{
+        //    Clients.Caller.sendMessage(string.Format(msg), count);
+        //}
     }
 }
