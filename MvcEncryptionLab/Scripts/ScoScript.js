@@ -143,7 +143,10 @@ function ShowProgressDialog(dialogTitle) {
     };
 
     // establish the connection to the server and start server-side operation
-    $.connection.hub.start();
+    $.connection.hub.start()
+        .done(function () { window.alert('Now connected, connection ID=' + $.connection.hub.id); })
+        .fail(function () { window.alert('Could not Connect!'); });
+
     //.done(
     //    function () {
     //       //progressNotifier.server.getCountAndMessage();
